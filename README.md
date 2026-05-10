@@ -5,7 +5,7 @@ Završni rad
 ## Radnje s githubom
 
 ```
-git clone
+git clone https://github.com/Petra200422/Haas-F1-Team.git
 ```
 
 Pri inicijalizaciji frontend-a i backend-a potrebno je preuzeti sve potrebne module
