@@ -9,12 +9,18 @@ git init
 git config user.email
 git config user.name
 git clone
-cd pa dalje
+cd
+
 ```
 
+## Instaliranje quasara
+
+```
+npm i -g @quasar/cli
+npm init quasar
+cd 
+```
 Pri inicijalizaciji frontend-a i backend-a potrebno je preuzeti sve potrebne module
-
-
 
 ## Frontend
 
