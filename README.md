@@ -36,4 +36,13 @@ npm install
 node api.js / nodemon api.js
 ```
 
+## Dodavanje promjena
+
+```
+git status
+git pull
+git add . (dodaje sve u pripremu za commit .) ili git add ime_datoteke (dodaje samo tu datoteku)
+git commit -m "Opis promjena" (stavlja se kratki opis promjena koje smo napravili)
+git push 
+```
 
