@@ -27,6 +27,19 @@
 
     </div>
 
+    <hr style="margin: 40px 0">
+
+    <h3>Partners</h3>
+
+    <div v-for="partner in partners" :key="partner.id_partner">
+
+      <img
+        :src="`http://localhost:3000/${partner.image_header}`"
+        style="max-width: 300px; margin-bottom: 20px"
+      />
+
+    </div>
+
   </div>
 </template>
 
@@ -36,6 +49,7 @@ import axios from 'axios'
 
 const images = ref([])
 const teamMembers = ref([])
+const partners = ref([])
 
 onMounted(async () => {
 
@@ -46,6 +60,11 @@ onMounted(async () => {
 
     const teamRes = await axios.get('http://localhost:3000/haas-team')
     teamMembers.value = teamRes.data
+
+    const res = await axios.get('http://localhost:3000/partners')
+    console.log(res.data)
+    partners.value = res.data
+
 
   } catch (err) {
     console.log(err)

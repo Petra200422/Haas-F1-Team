@@ -57,6 +57,23 @@ app.get('/haas-team', (req, res) => {
 
 })
 
+app.get('/partners', (req, res) => {
+
+  const sql = 'SELECT id_partner, image_header FROM Partners'
+
+  db.query(sql, (err, results) => {
+
+    if (err) {
+      return res.status(500).json(err)
+    }
+
+    res.json(results)
+
+  })
+
+})
+
+
 const PORT = 3000
 
 app.listen(PORT, () => {
