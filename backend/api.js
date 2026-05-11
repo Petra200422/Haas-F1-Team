@@ -91,6 +91,86 @@ app.get('/circuits-sectors', (req, res) => {
 })
 
 
+app.get('/circuits-track', (req, res) => {
+
+  const sql = 'SELECT id_circuit, image_track FROM Circuits'
+
+  db.query(sql, (err, results) => {
+
+    if (err) {
+      return res.status(500).json(err)
+    }
+
+    res.json(results)
+
+  })
+
+})
+
+
+app.get('/circuits-profile', (req, res) => {
+
+  const sql = `
+    SELECT id_circuit, image_profile
+    FROM Circuits
+    WHERE image_profile IS NOT NULL
+  `
+
+  db.query(sql, (err, results) => {
+
+    if (err) {
+      return res.status(500).json(err)
+    }
+
+    res.json(results)
+
+  })
+
+})
+
+
+app.get('/circuits-header', (req, res) => {
+
+  const sql = `
+    SELECT id_circuit, image_header
+    FROM Circuits
+    WHERE image_header IS NOT NULL
+  `
+
+  db.query(sql, (err, results) => {
+
+    if (err) {
+      return res.status(500).json(err)
+    }
+
+    res.json(results)
+
+  })
+
+})
+
+
+app.get('/circuits-gallery', (req, res) => {
+
+  const sql = `
+    SELECT id_image, image
+    FROM Circuit_gallery
+    WHERE image IS NOT NULL
+  `
+
+  db.query(sql, (err, results) => {
+
+    if (err) {
+      return res.status(500).json(err)
+    }
+
+    res.json(results)
+
+  })
+
+})
+
+
 const PORT = 3000
 
 app.listen(PORT, () => {

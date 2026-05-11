@@ -44,7 +44,7 @@
 
     <h3>Circuit Sector Images</h3>
 
-    <div v-for="circuit in circuits" :key="circuit.id_circuit">
+    <div v-for="circuit in circuitsSectors" :key="circuit.id_circuit">
 
       <img
         :src="`http://localhost:3000/${circuit.image_sectors}`"
@@ -52,6 +52,64 @@
       />
 
     </div>
+
+    <hr style="margin: 40px 0">
+
+    <h3>Circuit Track Images</h3>
+
+    <div v-for="circuit in circuitsTrack" :key="circuit.id_circuit">
+
+      <img
+        :src="`http://localhost:3000/${circuit.image_track}`"
+        style="max-width: 500px; margin-bottom: 30px"
+      />
+
+    </div>
+
+
+    <hr style="margin: 40px 0">
+
+<h3>Circuit Profile Images</h3>
+
+<div v-for="circuit in circuitsProfile" :key="circuit.id_circuit">
+
+  <img
+    v-if="circuit.image_profile"
+    :src="`http://localhost:3000/${circuit.image_profile}`"
+    style="max-width: 500px; margin-bottom: 30px"
+  />
+
+</div>
+
+
+<hr style="margin: 40px 0">
+
+<h3>Circuit Header Images</h3>
+
+<div v-for="circuit in circuitsHeader" :key="circuit.id_circuit">
+
+  <img
+    v-if="circuit.image_header"
+    :src="`http://localhost:3000/${circuit.image_header}`"
+    style="max-width: 500px; margin-bottom: 30px"
+  />
+
+</div>
+
+
+<hr style="margin: 40px 0">
+
+<h3>Circuits Gallery Images</h3>
+
+<div v-for="image in circuitsGallery" :key="image.id_image">
+
+  <img
+    v-if="image.image"
+    :src="`http://localhost:3000/${image.image}`"
+    style="max-width: 500px; margin-bottom: 30px"
+  />
+
+</div>
 
   </div>
 </template>
@@ -63,7 +121,11 @@ import axios from 'axios'
 const images = ref([])
 const teamMembers = ref([])
 const partners = ref([])
-const circuits = ref([])
+const circuitsSectors = ref([])
+const circuitsTrack = ref([])
+const circuitsProfile = ref([])
+const circuitsHeader = ref([])
+const circuitsGallery = ref([])
 
 onMounted(async () => {
 
@@ -82,7 +144,27 @@ onMounted(async () => {
 
     const SectorsRes = await axios.get('http://localhost:3000/circuits-sectors')
     console.log(SectorsRes.data)
-    circuits.value = SectorsRes.data
+    circuitsSectors.value = SectorsRes.data
+
+
+    const TrackRes = await axios.get('http://localhost:3000/circuits-track')
+    console.log(TrackRes.data)
+    circuitsTrack.value = TrackRes.data
+
+
+    const ProfileRes = await axios.get('http://localhost:3000/circuits-profile')
+    console.log(ProfileRes.data)
+    circuitsProfile.value = ProfileRes.data
+
+
+    const HeaderRes = await axios.get('http://localhost:3000/circuits-header')
+    console.log(HeaderRes.data)
+    circuitsHeader.value = HeaderRes.data
+
+
+    const GalleryRes = await axios.get('http://localhost:3000/circuits-gallery')
+    console.log(GalleryRes.data)
+    circuitsGallery.value = GalleryRes.data
 
 
   } catch (err) {
