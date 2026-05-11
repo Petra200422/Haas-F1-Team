@@ -40,6 +40,19 @@
 
     </div>
 
+    <hr style="margin: 40px 0">
+
+    <h3>Circuit Sector Images</h3>
+
+    <div v-for="circuit in circuits" :key="circuit.id_circuit">
+
+      <img
+        :src="`http://localhost:3000/${circuit.image_sectors}`"
+        style="max-width: 500px; margin-bottom: 30px"
+      />
+
+    </div>
+
   </div>
 </template>
 
@@ -50,6 +63,7 @@ import axios from 'axios'
 const images = ref([])
 const teamMembers = ref([])
 const partners = ref([])
+const circuits = ref([])
 
 onMounted(async () => {
 
@@ -61,9 +75,14 @@ onMounted(async () => {
     const teamRes = await axios.get('http://localhost:3000/haas-team')
     teamMembers.value = teamRes.data
 
-    const res = await axios.get('http://localhost:3000/partners')
-    console.log(res.data)
-    partners.value = res.data
+    const PartnerRes = await axios.get('http://localhost:3000/partners')
+    console.log(PartnerRes.data)
+    partners.value = PartnerRes.data
+
+
+    const SectorsRes = await axios.get('http://localhost:3000/circuits-sectors')
+    console.log(SectorsRes.data)
+    circuits.value = SectorsRes.data
 
 
   } catch (err) {

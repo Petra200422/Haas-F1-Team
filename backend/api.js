@@ -74,6 +74,23 @@ app.get('/partners', (req, res) => {
 })
 
 
+app.get('/circuits-sectors', (req, res) => {
+
+  const sql = 'SELECT id_circuit, image_sectors FROM Circuits'
+
+  db.query(sql, (err, results) => {
+
+    if (err) {
+      return res.status(500).json(err)
+    }
+
+    res.json(results)
+
+  })
+
+})
+
+
 const PORT = 3000
 
 app.listen(PORT, () => {
