@@ -2,11 +2,24 @@ const routes = [
   {
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/IndexPage.vue') }],
-  },
+    children: [{ path: '', component: () => import('pages/IndexPage.vue') },
+      { path: '/team', component: () => import('pages/TeamPage.vue')},
+      { path: '/member', component: () => import('pages/TeamMemberPage.vue')},
+      { path: '/car', component: () => import('pages/CarPage.vue')},
+      { path: '/standings', component: () => import('pages/StandingsPage.vue')},
+      { path: '/schedule', component: () => import('pages/SchedulePage.vue')},
+      { path: '/race', component: () => import('pages/RacePage.vue')},
+      { path: '/articles', component: () => import('pages/ArticlesPage.vue')},
+      { path: '/newArticle', component: () => import('pages/NewArticlePage.vue')},
+      { path: '/article', component: () => import('pages/ArticlePage.vue')},
+      { path: '/editArticle', component: () => import('pages/EditArticlePage.vue')},
+      { path: '/contact', component: () => import('pages/ContactPage.vue')},
+      { path: '/partners', component: () => import('pages/PartnersPage.vue')},
+      { path: '/partner', component: () => import('pages/PartnerPage.vue')},
+      { path: '/adminLogin', component: () => import('pages/AdminLoginPage.vue')}],
 
-  // Always leave this as last one,
-  // but you can also remove it
+
+},
   {
     path: '/:catchAll(.*)*',
     component: () => import('pages/ErrorNotFound.vue'),
@@ -14,3 +27,4 @@ const routes = [
 ]
 
 export default routes
+
