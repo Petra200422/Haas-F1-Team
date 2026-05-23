@@ -8,12 +8,12 @@ body {
 h1 {
    font-family: 'IBM Plex Sans', sans-serif;
   font-weight: 600;
-  color: black;
+  color: rgb(255, 255, 255);
   font-size: 62px;
 }
 
 h2 {
-   font-family: 'IBM Plex Sans', sans-serif;
+  font-family: 'IBM Plex Sans', sans-serif;
   font-weight: 600;
   color: #C0BFBF;
   font-size: 36px;
@@ -22,7 +22,21 @@ h2 {
 h3 {
   font-family: 'IBM Plex Sans', sans-serif;
   font-weight: 600;
-  color: #C0BFBF;
+  color: #000000;
+  font-size: 36px;
+}
+
+h4 {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 600;
+  color: #6D6D6D;
   font-size: 20px;
+}
+
+p {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 500;
+  color: #000000;
+  font-size: 16px;
 }
 

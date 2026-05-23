@@ -1,8 +1,8 @@
 <template>
   
-  <q-layout view="lHh Lpr lFf">
+  <q-layout view="hhh Lpr lff">
 
-    <q-header class="nav">
+    <q-header class="nav" elevated>
 
       <div class="nav-inner">
 
@@ -28,7 +28,7 @@
       <router-view />
     </q-page-container>
 
-    <q-footer class="footer">
+    <div class="footer" >
 
     <div class="footer-inner">
     <div class="footer-col footer-about">
@@ -73,7 +73,7 @@
 
   </div>
 
-</q-footer>
+</div>
 
   </q-layout>
 </template>
@@ -90,10 +90,12 @@ import logo from 'src/assets/Logo-Navigacija.png'
 /* navigacija */
 .nav {
   background: white;
-  position: sticky;
+  position: fixed;
   top: 15px;
   margin: 15px 55px 0 55px;
+  border-radius: 5px;
   box-shadow: 0 4px 25px rgba(0, 0, 0, 0.12);
+  z-index: 9999;
 }
 
 .nav-inner {
@@ -128,6 +130,10 @@ import logo from 'src/assets/Logo-Navigacija.png'
   width: auto;
   cursor: pointer;
   padding: 5px;
+}
+
+.q-page-container {
+  padding-top: 0 !important;
 }
 
 
