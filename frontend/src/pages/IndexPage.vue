@@ -149,15 +149,6 @@ onMounted(loadDrivers)
   bottom: 60px;
 }
 
-.hero-text h1 {
-  margin-bottom: 0;
-  line-height: 1;
-}
-
-.hero-text h2 {
-  margin-top: 10px;
-  line-height: 1;
-}
 
 /* odlomak sa tekstom */
 .about-card {
@@ -171,15 +162,6 @@ onMounted(loadDrivers)
   margin-left: 55px;
 }
 
-.drivers-header h4 {
-  margin-bottom: 0;
-  line-height: 1;
-}
-
-.drivers-header h3 {
-  margin-top: 10px;
-  line-height: 1;
-}
 
 .drivers-grid {
   display: flex;

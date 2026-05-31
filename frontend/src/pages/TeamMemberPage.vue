@@ -11,7 +11,7 @@
       <div class="hero-overlay"></div>
       <div class="hero-text">
         <h1>
-          {{ member.name }} {{ member.surname }}
+          {{ member.name.toUpperCase() }} {{ member.surname.toUpperCase() }}
         </h1>
 
         <h2>
@@ -325,16 +325,6 @@ onMounted(() => {
   bottom: 60px;
 }
 
-.hero-text h1 {
-  margin-bottom: 0;
-  line-height: 1;
-}
-
-.hero-text h2 {
-  margin-top: 10px;
-  line-height: 1;
-}
-
 .member-content {
   display: flex;
   gap: 180px; /* razmak između teksta i kartice */
@@ -393,10 +383,6 @@ onMounted(() => {
   position: relative;
 }
 
-/* NASLOV */
-.racing-title {
-  margin-bottom: 10px;
-}
 
 /* PROSTOR IZMEĐU NASLOVA I KARTICA (OVDJE SU STRELICE) */
 .racing-arrows {
@@ -497,19 +483,11 @@ onMounted(() => {
 
 
 .gallery-section {
-  padding: 80px 70px 250px 70px;
-
-}
-
-.gallery-subtitle {
-  margin: 0;
-  line-height: 1;
+  padding: 80px 70px;
 }
 
 .gallery-title {
   margin-top: 10px;
-  margin-bottom: 10px;
-  line-height: 1;
 }
 
 /* ARROWS */

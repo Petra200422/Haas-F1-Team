@@ -133,7 +133,7 @@ app.get('/career-history/:id', (req, res) => {
       content AS description
     FROM Career_history
     WHERE id_member = ?
-    ORDER BY year ASC
+    ORDER BY year DESC
     `,
     [memberId],
     (err, result) => {

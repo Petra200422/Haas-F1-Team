@@ -1,16 +1,17 @@
 <template>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
+
   <q-layout view="hhh Lpr lff">
 
+    <!-- NAV -->
     <q-header class="nav">
-
       <div class="nav-inner">
 
         <router-link to="/">
-        <img :src="logo" class="logo"/>
+          <img :src="logo" class="logo"/>
         </router-link>
 
         <div class="links">
@@ -24,73 +25,134 @@
         </div>
 
       </div>
-
     </q-header>
 
-    <q-page-container>
-      <router-view />
-    </q-page-container>
+    <!-- LOADER OVERLAY (NE blokira sadržaj) -->
+  <div v-if="loading" class="global-loader">
+    <div class="spinner"></div>
+  </div>
 
-    <div class="footer" >
+  <!-- PAGE -->
+  <q-page-container>
+    <router-view />
+  </q-page-container>
 
-    <div class="footer-inner">
-    <div class="footer-col footer-about">
+    <!-- FOOTER -->
+    <div class="footer">
 
-        <router-link to="/">
-        <img :src="logo" class="logo-footer"/>
-        </router-link>
+      <div class="footer-inner">
 
-      <p class="footer-text">
-        Haas F1 Team is focused on continuous development, teamwork, and improving performance both on and off the track. With a strong engineering base and clear long-term vision, the team is committed to building a more competitive future in Formula 1.
-      </p>
+        <div class="footer-col footer-about">
+          <router-link to="/">
+            <img :src="logo" class="logo-footer"/>
+          </router-link>
+
+          <p class="footer-text">
+           Haas F1 Team is focused on continuous development, teamwork, and improving performance both on and off the track. With a strong engineering base and clear long-term vision, the team is committed to building a more competitive future in Formula 1.
+          </p>
+        </div>
+
+        <div class="footer-col footer-nav">
+          <div class="footer-nav-col">
+            <router-link to="/team">Team</router-link>
+            <router-link to="/car">Car</router-link>
+            <router-link to="/standings">Standings</router-link>
+            <router-link to="/schedule">Schedule</router-link>
+          </div>
+
+          <div class="footer-nav-col">
+            <router-link to="/articles">Articles</router-link>
+            <router-link to="/partners">Partners</router-link>
+            <router-link to="/contact">Contact</router-link>
+            <router-link to="/adminLogin">Admin</router-link>
+          </div>
+        </div>
+
+        <div class="footer-col footer-social">
+          <a href="https://www.instagram.com/haasf1team/" target="_blank"><i class="fa-brands fa-instagram"></i>Instagram</a>
+          <a href="https://www.facebook.com/haasf1team/" target="_blank"><i class="fa-brands fa-facebook"></i>Facebook</a>
+          <a href="https://x.com/HaasF1Team" target="_blank"><i class="fa-brands fa-x-twitter"></i>Twitter</a>
+          <a href="https://www.tiktok.com/@haasf1official" target="_blank"><i class="fa-brands fa-tiktok"></i>TikTok</a>
+          <a href="https://www.youtube.com/c/haasf1team" target="_blank"><i class="fa-brands fa-youtube"></i>YouTube</a>
+        </div>
+
+      </div>
 
     </div>
-
-  <div class="footer-col footer-nav">
-
-  <div class="footer-nav-col">
-    <router-link to="/team">Team</router-link>
-    <router-link to="/car">Car</router-link>
-    <router-link to="/standings">Standings</router-link>
-    <router-link to="/schedule">Schedule</router-link>
-  </div>
-
-  <div class="footer-nav-col">
-    <router-link to="/articles">Articles</router-link>
-    <router-link to="/partners">Partners</router-link>
-    <router-link to="/contact">Contact</router-link>
-    <router-link to="/adminLogin">Admin</router-link>
-  </div>
-
-</div>
-
-    <div class="footer-col footer-social">
-
-      <a href="https://www.instagram.com/haasf1team/" target="_blank"><i class="fa-brands fa-instagram"></i>Instagram</a>
-      <a href="https://www.facebook.com/haasf1team/" target="_blank"><i class="fa-brands fa-facebook"></i>Facebook</a>
-      <a href="https://x.com/HaasF1Team" target="_blank"><i class="fa-brands fa-x-twitter"></i>Twitter</a>
-      <a href="https://www.tiktok.com/@haasf1official" target="_blank"><i class="fa-brands fa-tiktok"></i>TikTok</a>
-      <a href="https://www.youtube.com/c/haasf1team" target="_blank"><i class="fa-brands fa-youtube"></i>YouTube</a>
-
-    </div>
-
-  </div>
-
-</div>
 
   </q-layout>
 </template>
 
-
 <script setup>
 
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import logo from 'src/assets/Logo-Navigacija.png'
 
+const router = useRouter()
+const loading = ref(false)
+
+router.beforeEach(() => {
+  loading.value = true
+})
+
+router.afterEach(() => {
+  setTimeout(() => {
+    loading.value = false
+  }, 250)
+})
 </script>
 
-<style scoped> 
 
-/* navigacija */
+<style scoped>
+
+/* =======================
+   PAGE TRANSITION
+======================= */
+.page-enter-active,
+.page-leave-active {
+  transition: all 0.5s ease;
+}
+
+.page-enter-from {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.page-leave-to {
+  opacity: 0;
+  transform: translateY(-12px);
+}
+
+/* =======================
+   GLOBAL LOADER
+======================= */
+.global-loader {
+  position: fixed;
+  inset: 0;
+  background: rgb(255,255,255);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+}
+
+.spinner {
+  width: 45px;
+  height: 45px;
+  border: 4px solid #ddd;
+  border-top: 4px solid var(--q-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* =======================
+   NAV
+======================= */
 .nav {
   background: white;
   position: fixed;
@@ -139,13 +201,15 @@ import logo from 'src/assets/Logo-Navigacija.png'
   padding-top: 0 !important;
 }
 
-
-/* footer */
+/* =======================
+   FOOTER
+======================= */
 .footer {
   background: var(--q-secondary);
   color: black;
   padding: 50px 100px;
   border-top: 30px solid var(--q-primary);
+  margin-top: 100px;
 }
 
 .footer-inner {
@@ -207,7 +271,7 @@ import logo from 'src/assets/Logo-Navigacija.png'
 }
 
 .footer i {
-  font-size: 20px; 
+  font-size: 20px;
   margin-right: 8px;
 }
 
@@ -217,4 +281,5 @@ import logo from 'src/assets/Logo-Navigacija.png'
   margin-bottom: 10px;
   cursor: pointer;
 }
+
 </style>
