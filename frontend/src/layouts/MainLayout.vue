@@ -1,8 +1,11 @@
 <template>
-  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
   <q-layout view="hhh Lpr lff">
 
-    <q-header class="nav" elevated>
+    <q-header class="nav">
 
       <div class="nav-inner">
 
@@ -93,7 +96,6 @@ import logo from 'src/assets/Logo-Navigacija.png'
   position: fixed;
   top: 15px;
   margin: 15px 55px 0 55px;
-  border-radius: 5px;
   box-shadow: 0 4px 25px rgba(0, 0, 0, 0.12);
   z-index: 9999;
 }
@@ -130,6 +132,7 @@ import logo from 'src/assets/Logo-Navigacija.png'
   width: auto;
   cursor: pointer;
   padding: 5px;
+  margin-top: 5px;
 }
 
 .q-page-container {
@@ -149,7 +152,7 @@ import logo from 'src/assets/Logo-Navigacija.png'
   display: flex;
   justify-content: space-between;
   gap: 60px;
-  padding: 50px 40px 20px 40px;
+  padding: 50px 60px 20px 10px;
   align-items: stretch;
 }
 
@@ -173,6 +176,7 @@ import logo from 'src/assets/Logo-Navigacija.png'
   line-height: 1.5;
   color: black;
   max-width: 550px;
+  font-weight: 400;
 }
 
 .footer-nav {

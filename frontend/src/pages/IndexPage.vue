@@ -34,59 +34,83 @@
         <p>
           Today, the team enters a new chapter as TGR Haas F1 Team through a major partnership with Toyota and its motorsport division Toyota Gazoo Racing. This collaboration strengthens the team’s technical capabilities and supports its ongoing pursuit of performance and innovation.
         </p>
+        
 
       </div>
 
-<!-- DRIVERS SECTION -->
-<div class="drivers-section">
+  <!-- DRIVERS -->
+    <div class="drivers-section">
 
-  <!-- NASLOVI -->
-  <div class="drivers-header">
-
-    <h4>GET TO KNOW</h4>
-    <h3>OUR FORMULA 1 DRIVERS</h3>
-
-  </div>
-
-  <!-- DRIVERS GRID -->
-  <div class="drivers-grid">
-
-    <!-- DRIVER 1 -->
-    <div class="driver-card">
-
-      <img src="src/assets/Profile-Ollie.jpg" class="driver-img" />
-
-      <div class="driver-text">
-        <p>#87</p>
-        <p>Ollie Bearman</p>
+      <div class="drivers-header">
+        <h4>GET TO KNOW</h4>
+        <h3>OUR FORMULA 1 DRIVERS</h3>
       </div>
 
-    </div>
+      <div class="drivers-grid">
 
-    <!-- DRIVER 2 -->
-    <div class="driver-card">
+        <router-link
+          v-for="driver in drivers"
+          :key="driver.id_member"
+          :to="`/member/${driver.id_member}`"
+          class="driver-card"
+        >
 
-      <img src="src/assets/Profile-Esteban.jpg" class="driver-img" />
+          <img
+            :src="getImage(driver.image_profile)"
+            class="driver-img"
+          />
 
-      <div class="driver-text">
-        <p>#31</p>
-        <p>Esteban Ocon</p>
+          <div class="driver-text">
+            <p>#{{ driver.driver_number }}</p>
+            <p>{{ driver.name }} {{ driver.surname }}</p>
+          </div>
+
+        </router-link>
+
       </div>
 
     </div>
 
-  </div>
 
-</div>
-
+    
   </q-page>
 
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
+
+const drivers = ref([])
+
+const api_url = import.meta.env.VITE_API_URL
+
+const getImage = (path) => {
+  if (!path) return ''
+
+  return `${api_url}/${encodeURI(path)}`
+}
+
+const loadDrivers = async () => {
+  try {
+
+    const res = await axios.get(`${api_url}/haas-team`)
+
+    console.log(res.data)
+
+    drivers.value = res.data
+      .filter(driver => driver.role === 'driver')
+      .slice(0, 2)
+
+  } catch (err) {
+    console.error('LOADING DRIVERS ERROR:', err)
+  }
+}
+
+onMounted(loadDrivers)
 </script>
 
-<style scoped>
+<style>
 
 /* stranica */
 .home-page {
@@ -143,7 +167,6 @@
 }
 
 /* dio za vozacima */
-
 .drivers-header {
   margin-left: 55px;
 }
@@ -158,27 +181,53 @@
   line-height: 1;
 }
 
-
 .drivers-grid {
   display: flex;
+  justify-content: center;
+  gap: 60px;
   margin: 70px 200px;
 }
 
 .driver-card {
   position: relative;
-  flex: 1;
+  width: 50%;
+  max-width: 500px;
+
+  overflow: hidden; /* sakrije rubove kod zooma */
+}
+
+.driver-card {
+  position: relative;
+  width: 50%;
+  max-width: 500px;
+  overflow: hidden; /* sakrije rubove kod zooma */
 }
 
 .driver-img {
-  width: 80%;
+  width: 100%;
+  height: auto;
   display: block;
+
+  transition: transform 0.5s ease;
+}
+
+.driver-card:hover .driver-img {
+  transform: scale(1.05);
 }
 
 .driver-text {
   position: absolute;
-  top: 20px;
-  left: 20px;
-  color: white;
+  top: 30px;
+  left: 25px;
 }
+
+.driver-text p {
+  color: white;
+  font-weight: 400;
+  font-size: 18px;
+  margin-bottom: 10px;
+  line-height: 1;
+  letter-spacing: 1px;
+} 
 
 </style>
