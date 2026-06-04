@@ -10,6 +10,8 @@
         </h2>
       </div>
 
+      <div class="divider"></div>
+
     <!-- DRIVERS -->
     <section v-if="drivers.length" class="team-section">
 
@@ -212,6 +214,7 @@ onMounted(loadMembers)
 
 .page-header h1{
   color: black;
+  margin: 0;
 }
 
 .team-section {
@@ -224,6 +227,14 @@ onMounted(loadMembers)
 
 .team-info {
   width: 35%;
+}
+
+.divider {
+  height: 30px;
+  background: var(--q-primary);
+  margin: 80px 0 0 0;
+  margin-left: calc(-50vw + 50%); /* da izađe iz container paddinga */
+  margin-right: calc(-50vw + 50%); /* da izađe iz container paddinga */
 }
 
 .team-header {

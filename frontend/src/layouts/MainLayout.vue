@@ -22,6 +22,15 @@
           <q-btn flat to="/articles" label="Articles" class="nav-text"/>
           <q-btn flat to="/partners" label="Partners" class="nav-text"/>
           <q-btn flat to="/contact" label="Contact" class="nav-text"/>
+
+  <q-btn
+  v-if="isAdmin"
+  flat
+  class="logout-btn"
+  @click="logout"
+>
+  <i class="fa-solid fa-right-from-bracket"></i>
+</q-btn>
         </div>
 
       </div>
@@ -64,7 +73,7 @@
             <router-link to="/articles">Articles</router-link>
             <router-link to="/partners">Partners</router-link>
             <router-link to="/contact">Contact</router-link>
-            <router-link to="/adminLogin">Admin</router-link>
+            <router-link v-if="!isAdmin" to="/adminLogin"> Admin </router-link>
           </div>
         </div>
 
@@ -85,7 +94,7 @@
 
 <script setup>
 
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import logo from 'src/assets/Logo-Navigacija.png'
 
@@ -101,6 +110,58 @@ router.afterEach(() => {
     loading.value = false
   }, 250)
 })
+
+const isAdmin = ref(false)
+
+const checkAdmin = () => {
+
+  const user = JSON.parse(
+    localStorage.getItem('user')
+  )
+
+  isAdmin.value =
+    user &&
+    user.role === 'admin'
+}
+
+onMounted(() => {
+
+  checkAdmin()
+
+  window.addEventListener(
+    'admin-login',
+    checkAdmin
+  )
+
+  window.addEventListener(
+    'admin-logout',
+    checkAdmin
+  )
+})
+
+onUnmounted(() => {
+
+  window.removeEventListener(
+    'admin-login',
+    checkAdmin
+  )
+
+  window.removeEventListener(
+    'admin-logout',
+    checkAdmin
+  )
+})
+
+const logout = () => {
+
+  localStorage.removeItem('user')
+
+  window.dispatchEvent(
+    new Event('admin-logout')
+  )
+
+  router.push('/')
+}
 </script>
 
 
@@ -197,9 +258,20 @@ router.afterEach(() => {
   margin-top: 5px;
 }
 
+.logout-btn {
+  color: black;
+  font-size: 18px;
+}
+
+.logout-btn:hover {
+  color: var(--q-primary);
+}
+
 .q-page-container {
   padding-top: 0 !important;
 }
+
+
 
 /* =======================
    FOOTER
@@ -209,7 +281,7 @@ router.afterEach(() => {
   color: black;
   padding: 50px 100px;
   border-top: 30px solid var(--q-primary);
-  margin-top: 100px;
+  margin-top: auto;
 }
 
 .footer-inner {

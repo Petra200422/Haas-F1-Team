@@ -39,8 +39,8 @@
     <!-- GALLERY -->
 <section class="team-gallery">
 
-  <h4 class="gallery-subtitle">THROUGH THE YEARS</h4>
-  <h3 class="gallery-title">ON THE GRID</h3>
+  <h4 class="gallery-subtitle">GET A CLOSER LOOK</h4>
+  <h3 class="gallery-title">AT OUR CAR</h3>
 
   <!-- ARROWS -->
   <div class="gallery-arrows">

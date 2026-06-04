@@ -71,6 +71,45 @@
 
     </div>
 
+    <!-- ARTICLES -->
+<div class="news-section">
+
+  <div class="news-header">
+    <h4>FIND OUT</h4>
+    <h3>LATEST NEWS</h3>
+  </div>
+
+  <div class="news-grid">
+
+    <router-link
+      v-for="article in latestArticles"
+      :key="article.id_article"
+      :to="`/article/${article.id_article}`"
+      class="news-card"
+    >
+
+      <img
+        :src="getImage(article.image_profile)"
+        class="news-image"
+      />
+
+      <div class="news-date">
+        {{
+          new Date(article.published_at)
+            .toLocaleDateString('en-GB')
+        }}
+      </div>
+
+      <div class="news-title">
+        {{ article.long_title }}
+      </div>
+
+    </router-link>
+
+  </div>
+
+</div>
+
 
     
   </q-page>
@@ -82,6 +121,7 @@ import { ref, onMounted } from 'vue'
 import axios from 'axios'
 
 const drivers = ref([])
+const latestArticles = ref([])
 
 const api_url = import.meta.env.VITE_API_URL
 
@@ -107,7 +147,28 @@ const loadDrivers = async () => {
   }
 }
 
-onMounted(loadDrivers)
+const loadLatestArticles = async () => {
+  try {
+
+    const res = await axios.get(`${api_url}/articles`)
+
+    latestArticles.value = res.data
+      .sort(
+        (a, b) =>
+          new Date(b.published_at) -
+          new Date(a.published_at)
+      )
+      .slice(0, 3)
+
+  } catch (err) {
+    console.error('LOADING ARTICLES ERROR:', err)
+  }
+}
+
+onMounted(() => {
+  loadDrivers()
+  loadLatestArticles()
+})
 </script>
 
 <style>
@@ -211,5 +272,71 @@ onMounted(loadDrivers)
   line-height: 1;
   letter-spacing: 1px;
 } 
+
+/* NEWS SECTION */
+.news-section {
+  padding: 120px 70px;
+}
+
+.news-header {
+  margin-left: 55px;
+  margin-bottom: 60px;
+}
+
+/* ISTI GRID KAO ARTICLES */
+.news-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  margin: 0 55px;
+}
+
+.news-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-decoration: none;
+  color: black;
+  transition: transform 0.25s ease;
+}
+
+.news-card:hover {
+  transform: translateY(-5px);
+}
+
+.news-card:hover .news-title {
+  color: var(--q-primary);
+}
+
+/* SLIKA */
+.news-image {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  box-shadow: 0 4px 25px rgba(0,0,0,0.1);
+}
+
+/* DATUM */
+.news-date {
+  font-size: 13px;
+  color: #777;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-weight: 400;
+}
+
+/* NASLOV */
+.news-title {
+  font-size: 18px;
+  font-weight: 500;
+  font-family: "IBM Plex Sans", sans-serif;
+  line-height: 1.4;
+
+  /* da ne izlazi iz kartice */
+  width: 100%;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
 
 </style>
