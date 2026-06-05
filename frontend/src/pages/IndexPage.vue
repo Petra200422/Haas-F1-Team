@@ -215,8 +215,15 @@ onMounted(() => {
 .about-card {
   padding: 150px 430px;
   justify-content: center;
-  text-align: justify;
+  margin: 0 auto;}
+
+/* odlomak sa tekstom */
+.about-card p{
+max-width: 900px;
+ text-align: justify;
 }
+
+
 
 /* dio za vozacima */
 .drivers-header {
@@ -273,10 +280,6 @@ onMounted(() => {
   letter-spacing: 1px;
 } 
 
-/* NEWS SECTION */
-.news-section {
-  padding: 120px 70px;
-}
 
 .news-header {
   margin-left: 55px;
@@ -289,6 +292,7 @@ onMounted(() => {
   grid-template-columns: repeat(3, 1fr);
   gap: 40px;
   margin: 0 55px;
+  padding: 20px 70px 120px 70px;
 }
 
 .news-card {

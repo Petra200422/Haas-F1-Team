@@ -327,7 +327,7 @@ onMounted(() => {
 
 .member-content {
   display: flex;
-  gap: 180px; /* razmak između teksta i kartice */
+  gap: 400px; /* razmak između teksta i kartice */
   padding: 150px 70px 70px 70px;
 }
 

@@ -248,7 +248,7 @@ onMounted(loadMembers)
 .team-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 40px;
+  gap: 80px;
 }
 
 .team-card {
