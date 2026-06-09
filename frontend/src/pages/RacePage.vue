@@ -56,8 +56,11 @@
         <div class="sector-toggle">
           <span>SECTORS</span>
 
-          <label>
+          <label class="custom-checkbox">
             <input type="checkbox" v-model="showSectors" />
+
+            <span class="checkmark"></span>
+
             {{ showSectors ? 'ON' : 'OFF' }}
           </label>
         </div>
@@ -417,6 +420,28 @@ onMounted(() => {
 
 .sector-toggle label {
   font-size: 14px;
+}
+
+.custom-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.custom-checkbox input {
+  display: none;
+}
+
+.checkmark {
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--q-primary);
+  background: white;
+}
+
+.custom-checkbox input:checked + .checkmark {
+  background: var(--q-primary);
 }
 
 /* DESCRIPTION */
