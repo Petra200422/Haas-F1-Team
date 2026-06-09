@@ -1,103 +1,81 @@
 <template>
   <q-page class="contact-page">
-
     <!-- HERO -->
     <section class="hero-section">
-
       <h4>HOW TO GET IN TOUCH WITH</h4>
       <h3>TGR HAAS F1 TEAM</h3>
 
       <p class="intro-text">
-        TGR Haas F1 Team operates across multiple international locations,
-        bringing together engineering, management, and race operations.
-        Each facility plays an important role in supporting the team
-        throughout the Formula 1 season.
+        TGR Haas F1 Team operates across multiple international locations, bringing together
+        engineering, management, and race operations. Each facility plays an important role in
+        supporting the team throughout the Formula 1 season.
       </p>
-
     </section>
 
     <q-separator color="primary" />
 
     <!-- HEADQUARTERS -->
     <section class="section">
-
       <h4>HEADQUARTERS</h4>
       <h3>ADDRESSES</h3>
 
       <div class="address-grid">
-
         <q-card flat class="address-card">
           <q-card-section>
-
             <h5>America</h5>
 
             <p>
-              4001 Haas Way<br>
-              Kannapolis<br>
+              4001 Haas Way<br />
+              Kannapolis<br />
               28081, NC, USA
             </p>
-
           </q-card-section>
         </q-card>
 
         <q-card flat class="address-card">
           <q-card-section>
-
             <h5>United Kingdom</h5>
 
             <p>
-              Haas Racing<br>
-              Overthorpe Road<br>
-              Banbury<br>
+              Haas Racing<br />
+              Overthorpe Road<br />
+              Banbury<br />
               OX16 4PN, UK
             </p>
-
           </q-card-section>
         </q-card>
 
         <q-card flat class="address-card">
           <q-card-section>
-
             <h5>Italy</h5>
 
             <p>
-              43040 Varano de' Melegari (PR)<br>
+              43040 Varano de' Melegari (PR)<br />
               Via Papa Giovanni XXIII 2/d, IT
             </p>
-
           </q-card-section>
         </q-card>
-
       </div>
-
     </section>
 
     <q-separator color="primary" />
 
     <!-- PARTNERSHIPS -->
     <section class="section alternate">
-
       <h4>NEW</h4>
       <h3>PARTNERSHIPS</h3>
 
       <p>
-        For queries about becoming a partner of TGR Haas F1 Team,
-        please contact our Business Development team:
+        For queries about becoming a partner of TGR Haas F1 Team, please contact our Business
+        Development team:
       </p>
 
-      <a
-        class="contact-link"
-      >
-        partnerships@haas.com
-      </a>
-
+      <a class="contact-link"> partnerships@haas.com </a>
     </section>
-
   </q-page>
 </template>
 
 <style scoped>
-
 .contact-page {
   max-width: 1200px;
   margin: 0 auto;
@@ -152,7 +130,7 @@ h3 {
 .address-card {
   background: var(--q-accent);
   height: 100%;
-  box-shadow: 0 4px 25px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
 }
 
 /* DRŽAVA */
@@ -180,5 +158,4 @@ p {
   text-decoration: none;
   font-weight: 600;
 }
-
 </style>

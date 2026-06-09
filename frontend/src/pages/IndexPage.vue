@@ -1,119 +1,90 @@
 <template>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+  />
 
   <q-page class="home-page">
-
     <div class="hero-section">
-
       <img src="src/assets/Header-Home.jpg" class="hero-image" />
 
       <div class="hero-overlay"></div>
 
       <div class="hero-text">
-
         <h1>TGR HAAS F1 TEAM</h1>
 
         <h2>FORMULA 1 TEAM</h2>
-
       </div>
-
     </div>
 
-  
-      <div class="about-card">
+    <div class="about-card">
+      <h3>An American Formula 1 team driven by engineering excellence.</h3>
 
-        <h3>
-          An American Formula 1 team driven by engineering excellence.
-        </h3>
+      <p>
+        TGR Haas F1 Team represents American determination and engineering excellence at the highest
+        level of motorsport – Formula 1. Founded by entrepreneur Gene Haas, the team made its debut
+        in 2016 and quickly became part of the competitive Formula 1 paddock.
+      </p>
 
-        <p>
-          TGR Haas F1 Team represents American determination and engineering excellence at the highest level of motorsport – Formula 1. Founded by entrepreneur Gene Haas, the team made its debut in 2016 and quickly became part of the competitive Formula 1 paddock.
-        </p>
+      <p>
+        Today, the team enters a new chapter as TGR Haas F1 Team through a major partnership with
+        Toyota and its motorsport division Toyota Gazoo Racing. This collaboration strengthens the
+        team’s technical capabilities and supports its ongoing pursuit of performance and
+        innovation.
+      </p>
+    </div>
 
-        <p>
-          Today, the team enters a new chapter as TGR Haas F1 Team through a major partnership with Toyota and its motorsport division Toyota Gazoo Racing. This collaboration strengthens the team’s technical capabilities and supports its ongoing pursuit of performance and innovation.
-        </p>
-        
-
-      </div>
-
-  <!-- DRIVERS -->
+    <!-- DRIVERS -->
     <div class="drivers-section">
-
       <div class="drivers-header">
         <h4>GET TO KNOW</h4>
         <h3>OUR FORMULA 1 DRIVERS</h3>
       </div>
 
       <div class="drivers-grid">
-
         <router-link
           v-for="driver in drivers"
           :key="driver.id_member"
           :to="`/member/${driver.id_member}`"
           class="driver-card"
         >
-
-          <img
-            :src="getImage(driver.image_profile)"
-            class="driver-img"
-          />
+          <img :src="getImage(driver.image_profile)" class="driver-img" />
 
           <div class="driver-text">
             <p>#{{ driver.driver_number }}</p>
             <p>{{ driver.name }} {{ driver.surname }}</p>
           </div>
-
         </router-link>
-
       </div>
-
     </div>
 
     <!-- ARTICLES -->
-<div class="news-section">
-
-  <div class="news-header">
-    <h4>FIND OUT</h4>
-    <h3>LATEST NEWS</h3>
-  </div>
-
-  <div class="news-grid">
-
-    <router-link
-      v-for="article in latestArticles"
-      :key="article.id_article"
-      :to="`/article/${article.id_article}`"
-      class="news-card"
-    >
-
-      <img
-        :src="getImage(article.image_profile)"
-        class="news-image"
-      />
-
-      <div class="news-date">
-        {{
-          new Date(article.published_at)
-            .toLocaleDateString('en-GB')
-        }}
+    <div class="news-section">
+      <div class="news-header">
+        <h4>FIND OUT</h4>
+        <h3>LATEST NEWS</h3>
       </div>
 
-      <div class="news-title">
-        {{ article.long_title }}
+      <div class="news-grid">
+        <router-link
+          v-for="article in latestArticles"
+          :key="article.id_article"
+          :to="`/article/${article.id_article}`"
+          class="news-card"
+        >
+          <img :src="getImage(article.image_profile)" class="news-image" />
+
+          <div class="news-date">
+            {{ new Date(article.published_at).toLocaleDateString('en-GB') }}
+          </div>
+
+          <div class="news-title">
+            {{ article.long_title }}
+          </div>
+        </router-link>
       </div>
-
-    </router-link>
-
-  </div>
-
-</div>
-
-
-    
+    </div>
   </q-page>
-
 </template>
 
 <script setup>
@@ -133,15 +104,11 @@ const getImage = (path) => {
 
 const loadDrivers = async () => {
   try {
-
     const res = await axios.get(`${api_url}/haas-team`)
 
     console.log(res.data)
 
-    drivers.value = res.data
-      .filter(driver => driver.role === 'driver')
-      .slice(0, 2)
-
+    drivers.value = res.data.filter((driver) => driver.role === 'driver').slice(0, 2)
   } catch (err) {
     console.error('LOADING DRIVERS ERROR:', err)
   }
@@ -149,17 +116,11 @@ const loadDrivers = async () => {
 
 const loadLatestArticles = async () => {
   try {
-
     const res = await axios.get(`${api_url}/articles`)
 
     latestArticles.value = res.data
-      .sort(
-        (a, b) =>
-          new Date(b.published_at) -
-          new Date(a.published_at)
-      )
+      .sort((a, b) => new Date(b.published_at) - new Date(a.published_at))
       .slice(0, 3)
-
   } catch (err) {
     console.error('LOADING ARTICLES ERROR:', err)
   }
@@ -172,7 +133,6 @@ onMounted(() => {
 </script>
 
 <style>
-
 /* stranica */
 .home-page {
   background: #ffffff;
@@ -201,7 +161,6 @@ onMounted(() => {
   );
 }
 
-
 /* naslovi na slici*/
 .hero-text {
   position: absolute;
@@ -210,26 +169,23 @@ onMounted(() => {
   bottom: 60px;
 }
 
-
 /* odlomak sa tekstom */
 .about-card {
   padding: 150px 430px;
   justify-content: center;
-  margin: 0 auto;}
-
-/* odlomak sa tekstom */
-.about-card p{
-max-width: 900px;
- text-align: justify;
+  margin: 0 auto;
 }
 
-
+/* odlomak sa tekstom */
+.about-card p {
+  max-width: 900px;
+  text-align: justify;
+}
 
 /* dio za vozacima */
 .drivers-header {
   margin-left: 55px;
 }
-
 
 .drivers-grid {
   display: flex;
@@ -278,8 +234,7 @@ max-width: 900px;
   margin-bottom: 10px;
   line-height: 1;
   letter-spacing: 1px;
-} 
-
+}
 
 .news-header {
   margin-left: 55px;
@@ -318,14 +273,14 @@ max-width: 900px;
   height: auto;
   object-fit: contain;
   display: block;
-  box-shadow: 0 4px 25px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
 }
 
 /* DATUM */
 .news-date {
   font-size: 13px;
   color: #777;
-  font-family: "IBM Plex Sans", sans-serif;
+  font-family: 'IBM Plex Sans', sans-serif;
   font-weight: 400;
 }
 
@@ -333,7 +288,7 @@ max-width: 900px;
 .news-title {
   font-size: 18px;
   font-weight: 500;
-  font-family: "IBM Plex Sans", sans-serif;
+  font-family: 'IBM Plex Sans', sans-serif;
   line-height: 1.4;
 
   /* da ne izlazi iz kartice */
@@ -341,6 +296,4 @@ max-width: 900px;
   overflow-wrap: break-word;
   word-break: break-word;
 }
-
-
 </style>

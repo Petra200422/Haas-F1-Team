@@ -1,30 +1,16 @@
 <template>
   <q-page class="article-page">
-
     <div class="article-background"></div>
 
     <div class="article-container">
-
       <div class="article-content">
-
         <h3>EDIT ARTICLE</h3>
         <h4>UPDATE INFORMATION</h4>
 
         <q-form @submit.prevent="updateArticle" class="article-form">
+          <q-input v-model="form.short_title" label="Short title" outlined class="article-input" />
 
-          <q-input
-            v-model="form.short_title"
-            label="Short title"
-            outlined
-            class="article-input"
-          />
-
-          <q-input
-            v-model="form.long_title"
-            label="Long title"
-            outlined
-            class="article-input"
-          />
+          <q-input v-model="form.long_title" label="Long title" outlined class="article-input" />
 
           <q-input
             v-model="form.text"
@@ -72,13 +58,9 @@
             :loading="loading"
             class="article-btn"
           />
-
         </q-form>
-
       </div>
-
     </div>
-
   </q-page>
 </template>
 
@@ -107,9 +89,8 @@ const form = ref({
   text: '',
   published_at: '',
   image_profile: '',
-  image_header: ''
+  image_header: '',
 })
-
 
 // LOAD DATA
 const loadArticle = async () => {
@@ -122,19 +103,14 @@ const loadArticle = async () => {
     form.value.text = data.text
 
     // 🔥 FIX DATE
-    form.value.published_at = data.published_at
-      ? data.published_at.split('T')[0]
-      : ''
+    form.value.published_at = data.published_at ? data.published_at.split('T')[0] : ''
 
     form.value.image_profile = data.image_profile
     form.value.image_header = data.image_header
-
   } catch (error) {
     error.value = 'Error loading article'
   }
 }
-
-
 
 // UPDATE
 const updateArticle = async () => {
@@ -157,18 +133,13 @@ const updateArticle = async () => {
       fd.append('image_header', imageHeader.value)
     }
 
-    await axios.put(
-      `${api_url}/articles/${articleId}`,
-      fd,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    )
+    await axios.put(`${api_url}/articles/${articleId}`, fd, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
 
     router.push('/articles')
-
   } catch (error) {
     error.value = 'Update failed'
   } finally {
@@ -180,7 +151,6 @@ onMounted(loadArticle)
 </script>
 
 <style scoped>
-
 .article-page {
   min-height: 100vh;
   position: relative;
@@ -247,5 +217,4 @@ onMounted(loadArticle)
   color: #d32f2f;
   font-size: 14px;
 }
-
 </style>

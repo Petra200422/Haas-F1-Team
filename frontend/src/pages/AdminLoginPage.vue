@@ -1,26 +1,14 @@
 <template>
   <q-page class="login-page">
-
     <div class="background-split"></div>
 
     <div class="login-container">
-
       <div class="login-content">
-
         <h3>EDIT THE HAAS GRID</h3>
         <h4>ADMINISTRATION PANEL</h4>
 
-        <q-form
-          @submit.prevent="submitForm"
-          class="login-form"
-        >
-
-          <q-input
-            v-model="username"
-            label="Username"
-            outlined
-            class="form-input"
-          />
+        <q-form @submit.prevent="submitForm" class="login-form">
+          <q-input v-model="username" label="Username" outlined class="form-input" />
 
           <q-input
             v-model="password"
@@ -42,13 +30,9 @@
             :loading="loading"
             class="login-btn"
           />
-
         </q-form>
-
       </div>
-
     </div>
-
   </q-page>
 </template>
 
@@ -68,19 +52,14 @@ const loading = ref(false)
 const error = ref('')
 
 const submitForm = async () => {
-
   loading.value = true
   error.value = ''
 
   try {
-
-    const res = await axios.post(
-      `${api_url}/admin/login`,
-      {
-        username: username.value,
-        password: password.value
-      }
-    )
+    const res = await axios.post(`${api_url}/admin/login`, {
+      username: username.value,
+      password: password.value,
+    })
 
     // 🔥 SPREMI TOKEN (OVO TI FALI)
     localStorage.setItem('token', res.data.token)
@@ -91,21 +70,16 @@ const submitForm = async () => {
       JSON.stringify({
         id: res.data.admin.id_admin,
         username: res.data.admin.username,
-        role: 'admin'
-      })
+        role: 'admin',
+      }),
     )
 
     // obavijesti app
     window.dispatchEvent(new Event('admin-login'))
 
     router.push('/')
-
   } catch (err) {
-
-    error.value =
-      err.response?.data?.message ||
-      'Login failed'
-
+    error.value = err.response?.data?.message || 'Login failed'
   } finally {
     loading.value = false
   }
@@ -113,7 +87,6 @@ const submitForm = async () => {
 </script>
 
 <style scoped>
-
 .login-page {
   min-height: 100vh;
   position: relative;
@@ -125,14 +98,13 @@ const submitForm = async () => {
   position: absolute;
   inset: 0;
 
-  background:
-    linear-gradient(
-      115deg,
-      white 0%,
-      white 55%,
-      var(--q-primary) 55%,
-      var(--q-primary) 100%
-    );
+  background: linear-gradient(
+    115deg,
+    white 0%,
+    white 55%,
+    var(--q-primary) 55%,
+    var(--q-primary) 100%
+  );
 }
 
 .login-container {
@@ -181,5 +153,4 @@ const submitForm = async () => {
   color: #d32f2f;
   font-size: 14px;
 }
-
 </style>

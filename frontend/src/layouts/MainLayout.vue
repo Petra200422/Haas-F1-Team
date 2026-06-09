@@ -1,63 +1,61 @@
 <template>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+  />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&display=swap"
+    rel="stylesheet"
+  />
 
   <q-layout view="hhh Lpr lff">
-
     <!-- NAV -->
     <q-header class="nav">
       <div class="nav-inner">
-
         <router-link to="/">
-          <img :src="logo" class="logo"/>
+          <img :src="logo" class="logo" />
         </router-link>
 
         <div class="links">
-          <q-btn flat to="/team" label="Team" class="nav-text"/>
-          <q-btn flat to="/car" label="Car" class="nav-text"/>
-          <q-btn flat to="/standings" label="Standings" class="nav-text"/>
-          <q-btn flat to="/schedule" label="Schedule" class="nav-text"/>
-          <q-btn flat to="/articles" label="Articles" class="nav-text"/>
-          <q-btn flat to="/partners" label="Partners" class="nav-text"/>
-          <q-btn flat to="/contact" label="Contact" class="nav-text"/>
+          <q-btn flat to="/team" label="Team" class="nav-text" />
+          <q-btn flat to="/car" label="Car" class="nav-text" />
+          <q-btn flat to="/standings" label="Standings" class="nav-text" />
+          <q-btn flat to="/schedule" label="Schedule" class="nav-text" />
+          <q-btn flat to="/articles" label="Articles" class="nav-text" />
+          <q-btn flat to="/partners" label="Partners" class="nav-text" />
+          <q-btn flat to="/contact" label="Contact" class="nav-text" />
 
-  <q-btn
-  v-if="isAdmin"
-  flat
-  class="logout-btn"
-  @click="logout"
->
-  <i class="fa-solid fa-right-from-bracket"></i>
-</q-btn>
+          <q-btn v-if="isAdmin" flat class="logout-btn" @click="logout">
+            <i class="fa-solid fa-right-from-bracket"></i>
+          </q-btn>
         </div>
-
       </div>
     </q-header>
 
     <!-- LOADER OVERLAY (NE blokira sadržaj) -->
-  <div v-if="loading" class="global-loader">
-    <div class="spinner"></div>
-  </div>
+    <div v-if="loading" class="global-loader">
+      <div class="spinner"></div>
+    </div>
 
-  <!-- PAGE -->
-  <q-page-container>
-    <router-view />
-  </q-page-container>
+    <!-- PAGE -->
+    <q-page-container>
+      <router-view />
+    </q-page-container>
 
     <!-- FOOTER -->
     <div class="footer">
-
       <div class="footer-inner">
-
         <div class="footer-col footer-about">
           <router-link to="/">
-            <img :src="logo" class="logo-footer"/>
+            <img :src="logo" class="logo-footer" />
           </router-link>
 
           <p class="footer-text">
-           Haas F1 Team is focused on continuous development, teamwork, and improving performance both on and off the track. With a strong engineering base and clear long-term vision, the team is committed to building a more competitive future in Formula 1.
+            Haas F1 Team is focused on continuous development, teamwork, and improving performance
+            both on and off the track. With a strong engineering base and clear long-term vision,
+            the team is committed to building a more competitive future in Formula 1.
           </p>
         </div>
 
@@ -78,22 +76,28 @@
         </div>
 
         <div class="footer-col footer-social">
-          <a href="https://www.instagram.com/haasf1team/" target="_blank"><i class="fa-brands fa-instagram"></i>Instagram</a>
-          <a href="https://www.facebook.com/haasf1team/" target="_blank"><i class="fa-brands fa-facebook"></i>Facebook</a>
-          <a href="https://x.com/HaasF1Team" target="_blank"><i class="fa-brands fa-x-twitter"></i>Twitter</a>
-          <a href="https://www.tiktok.com/@haasf1official" target="_blank"><i class="fa-brands fa-tiktok"></i>TikTok</a>
-          <a href="https://www.youtube.com/c/haasf1team" target="_blank"><i class="fa-brands fa-youtube"></i>YouTube</a>
+          <a href="https://www.instagram.com/haasf1team/" target="_blank"
+            ><i class="fa-brands fa-instagram"></i>Instagram</a
+          >
+          <a href="https://www.facebook.com/haasf1team/" target="_blank"
+            ><i class="fa-brands fa-facebook"></i>Facebook</a
+          >
+          <a href="https://x.com/HaasF1Team" target="_blank"
+            ><i class="fa-brands fa-x-twitter"></i>Twitter</a
+          >
+          <a href="https://www.tiktok.com/@haasf1official" target="_blank"
+            ><i class="fa-brands fa-tiktok"></i>TikTok</a
+          >
+          <a href="https://www.youtube.com/c/haasf1team" target="_blank"
+            ><i class="fa-brands fa-youtube"></i>YouTube</a
+          >
         </div>
-
       </div>
-
     </div>
-
   </q-layout>
 </template>
 
 <script setup>
-
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import logo from 'src/assets/Logo-Navigacija.png'
@@ -114,59 +118,35 @@ router.afterEach(() => {
 const isAdmin = ref(false)
 
 const checkAdmin = () => {
+  const user = JSON.parse(localStorage.getItem('user'))
 
-  const user = JSON.parse(
-    localStorage.getItem('user')
-  )
-
-  isAdmin.value =
-    user &&
-    user.role === 'admin'
+  isAdmin.value = user && user.role === 'admin'
 }
 
 onMounted(() => {
-
   checkAdmin()
 
-  window.addEventListener(
-    'admin-login',
-    checkAdmin
-  )
+  window.addEventListener('admin-login', checkAdmin)
 
-  window.addEventListener(
-    'admin-logout',
-    checkAdmin
-  )
+  window.addEventListener('admin-logout', checkAdmin)
 })
 
 onUnmounted(() => {
+  window.removeEventListener('admin-login', checkAdmin)
 
-  window.removeEventListener(
-    'admin-login',
-    checkAdmin
-  )
-
-  window.removeEventListener(
-    'admin-logout',
-    checkAdmin
-  )
+  window.removeEventListener('admin-logout', checkAdmin)
 })
 
 const logout = () => {
-
   localStorage.removeItem('user')
 
-  window.dispatchEvent(
-    new Event('admin-logout')
-  )
+  window.dispatchEvent(new Event('admin-logout'))
 
   router.push('/')
 }
 </script>
 
-
 <style scoped>
-
 /* =======================
    PAGE TRANSITION
 ======================= */
@@ -191,7 +171,7 @@ const logout = () => {
 .global-loader {
   position: fixed;
   inset: 0;
-  background: rgb(255,255,255);
+  background: rgb(255, 255, 255);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -208,7 +188,9 @@ const logout = () => {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* =======================
@@ -270,8 +252,6 @@ const logout = () => {
 .q-page-container {
   padding-top: 0 !important;
 }
-
-
 
 /* =======================
    FOOTER
@@ -353,5 +333,4 @@ const logout = () => {
   margin-bottom: 10px;
   cursor: pointer;
 }
-
 </style>

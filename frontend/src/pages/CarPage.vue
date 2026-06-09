@@ -1,29 +1,24 @@
 <template>
   <q-page class="car-page">
-
     <!-- HERO -->
     <div class="car-hero">
-
       <img src="src/assets/Header-Car.jpg" class="car-hero-img" />
 
-        <div class="hero-overlay"></div>
+      <div class="hero-overlay"></div>
       <div class="car-hero-text">
         <h1>VF-26</h1>
         <h2>DESIGNED FOR SPEED</h2>
       </div>
-
     </div>
 
     <!-- SPECS TABLE -->
     <div class="car-specs">
-
       <div
         class="spec-row"
         v-for="(item, index) in specs"
         :key="index"
         :class="{ alt: index % 2 === 1 }"
       >
-
         <div class="spec-left">
           {{ item.label }}
         </div>
@@ -31,59 +26,41 @@
         <div class="spec-right">
           {{ item.value }}
         </div>
-
       </div>
-
     </div>
 
     <!-- GALLERY -->
-<section class="team-gallery">
+    <section class="team-gallery">
+      <h4 class="gallery-subtitle">GET A CLOSER LOOK</h4>
+      <h3 class="gallery-title">AT OUR CAR</h3>
 
-  <h4 class="gallery-subtitle">GET A CLOSER LOOK</h4>
-  <h3 class="gallery-title">AT OUR CAR</h3>
-
-  <!-- ARROWS -->
-  <div class="gallery-arrows">
-
-    <div class="arrow-box" @click="prevGallery">
-      <i class="fas fa-chevron-left"></i>
-    </div>
-
-    <div class="arrow-box" @click="nextGallery">
-      <i class="fas fa-chevron-right"></i>
-    </div>
-
-  </div>
-
-  <!-- SLIDER -->
-  <div class="gallery-wrapper">
-
-    <div class="gallery-track"
-         :style="{ transform: `translateX(-${galleryIndex * 100}%)` }">
-
-      <div class="gallery-group"
-           v-for="(group, gIndex) in groupedGallery"
-           :key="gIndex">
-
-        <div class="gallery-item" v-for="img in group" :key="img">
-
-          <img :src="getAssetImage(img)" />
-
+      <!-- ARROWS -->
+      <div class="gallery-arrows">
+        <div class="arrow-box" @click="prevGallery">
+          <i class="fas fa-chevron-left"></i>
         </div>
 
+        <div class="arrow-box" @click="nextGallery">
+          <i class="fas fa-chevron-right"></i>
+        </div>
       </div>
 
-    </div>
-
-  </div>
-
-</section>
-
+      <!-- SLIDER -->
+      <div class="gallery-wrapper">
+        <div class="gallery-track" :style="{ transform: `translateX(-${galleryIndex * 100}%)` }">
+          <div class="gallery-group" v-for="(group, gIndex) in groupedGallery" :key="gIndex">
+            <div class="gallery-item" v-for="img in group" :key="img">
+              <img :src="getAssetImage(img)" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </q-page>
 </template>
 
 <script setup>
-import { ref, computed  } from 'vue'
+import { ref, computed } from 'vue'
 
 const galleryIndex = ref(0)
 
@@ -95,7 +72,7 @@ const gallery = [
   '05-Car.jpg',
   '06-Car.jpg',
   '07-Car.jpg',
-  '08-Car.jpg'
+  '08-Car.jpg',
 ]
 
 // assets loader
@@ -131,9 +108,17 @@ const specs = [
   { label: 'Front & Rear Suspension', value: 'Independent suspension' },
   { label: 'Dampers', value: 'ZF Sachs / Öhlins' },
   { label: 'Steering', value: 'Ferrari' },
-  { label: 'Transmission', value: 'Ferrari servo-controlled hydraulic limited-slip differential with semi-automatic sequential and electronically-controlled gearbox, quick shift (eight gears, plus reverse)' },
+  {
+    label: 'Transmission',
+    value:
+      'Ferrari servo-controlled hydraulic limited-slip differential with semi-automatic sequential and electronically-controlled gearbox, quick shift (eight gears, plus reverse)',
+  },
   { label: 'Clutch', value: 'AP Racing' },
-  { label: 'Brake System', value: 'Carbon self-ventilating Brembo brake discs (front and rear), monobloc calipers in nickel-plated aluminum alloy (front and rear) and Brembo tandem master cylinder (with action on front and rear). Electronic control hydraulic system for the rear brakes (Brake by Wire).' },
+  {
+    label: 'Brake System',
+    value:
+      'Carbon self-ventilating Brembo brake discs (front and rear), monobloc calipers in nickel-plated aluminum alloy (front and rear) and Brembo tandem master cylinder (with action on front and rear). Electronic control hydraulic system for the rear brakes (Brake by Wire).',
+  },
   { label: 'Cockpit Instrumentation', value: 'Ferrari' },
   { label: 'Seatbelts', value: 'Sabelt' },
   { label: 'Steering Wheel', value: 'Ferrari' },
@@ -143,7 +128,7 @@ const specs = [
   { label: 'Fuel Cell', value: 'ATL' },
   { label: 'Fuel Provider', value: 'Shell' },
   { label: 'Overall Width', value: '1,900 mm' },
-  { label: 'Weight', value: '770 kg (with driver)' }
+  { label: 'Weight', value: '770 kg (with driver)' },
 ]
 </script>
 
@@ -165,9 +150,9 @@ const specs = [
 
   background: linear-gradient(
     to top,
-    rgba(0,0,0,0.85) 0%,
-    rgba(0,0,0,0.55) 35%,
-    rgba(0,0,0,0) 65%
+    rgba(0, 0, 0, 0.85) 0%,
+    rgba(0, 0, 0, 0.55) 35%,
+    rgba(0, 0, 0, 0) 65%
   );
 }
 
@@ -182,7 +167,6 @@ const specs = [
 .car-hero-text h1 {
   margin: 0;
 }
-
 
 /* TABLE */
 .car-specs {
@@ -288,6 +272,6 @@ const specs = [
   height: auto;
   object-fit: contain;
   display: block;
-  box-shadow: 0 4px 25px rgba(0,0,0,0.10);
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
 }
 </style>

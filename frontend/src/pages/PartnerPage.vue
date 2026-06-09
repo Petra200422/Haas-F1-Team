@@ -164,6 +164,7 @@ onMounted(loadPartner)
 .partner-title h1 {
   margin: 0;
   color:black;
+  text-transform: uppercase;
 }
 
 .partner-title h2 {

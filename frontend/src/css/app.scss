@@ -2,10 +2,11 @@
 body {
   font-family: 'IBM Plex Sans', sans-serif;
   font-weight: 400;
-  color: black
+  color: black;
 }
 
-html, body {
+html,
+body {
   overflow-x: hidden;
 }
 
@@ -14,20 +15,20 @@ html, body {
 }
 
 h1 {
-   font-family: 'IBM Plex Sans', sans-serif;
+  font-family: 'IBM Plex Sans', sans-serif;
   font-weight: 600;
   color: rgb(255, 255, 255);
   font-size: 62px;
-   margin-bottom: 0;
+  margin-bottom: 0;
   line-height: 1;
 }
 
 h2 {
   font-family: 'IBM Plex Sans', sans-serif;
   font-weight: 600;
-  color: #C0BFBF;
+  color: #c0bfbf;
   font-size: 36px;
-    margin-top: 10px;
+  margin-top: 10px;
   line-height: 1;
 }
 
@@ -36,14 +37,14 @@ h3 {
   font-weight: 600;
   color: #000000;
   font-size: 36px;
-    margin-top: 10px;
+  margin-top: 10px;
   line-height: 1;
 }
 
 h4 {
   font-family: 'IBM Plex Sans', sans-serif;
   font-weight: 600;
-  color: #6D6D6D;
+  color: #6d6d6d;
   font-size: 20px;
   margin: 0;
   line-height: 1;
@@ -55,5 +56,3 @@ p {
   color: #000000;
   font-size: 16px;
 }
-
-

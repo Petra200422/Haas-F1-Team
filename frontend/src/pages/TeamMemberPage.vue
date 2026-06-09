@@ -1,61 +1,40 @@
 <template>
-
   <q-page v-if="member">
     <div class="hero-section">
-
-      <img
-        :src="getImage(member.image_header)"
-        class="hero-image"
-      />
+      <img :src="getImage(member.image_header)" class="hero-image" />
 
       <div class="hero-overlay"></div>
       <div class="hero-text">
-        <h1>
-          {{ member.name.toUpperCase() }} {{ member.surname.toUpperCase() }}
-        </h1>
+        <h1>{{ member.name.toUpperCase() }} {{ member.surname.toUpperCase() }}</h1>
 
-        <h2>
-          OFFICIAL TEAM MEMBER
-        </h2>
+        <h2>OFFICIAL TEAM MEMBER</h2>
       </div>
-
     </div>
     <div class="member-content">
       <div class="member-description">
+        <p v-for="(paragraph, index) in firstParagraphs" :key="'first-' + index">
+          {{ paragraph }}
+        </p>
 
-  <p
-    v-for="(paragraph, index) in firstParagraphs"
-    :key="'first-' + index"
-  >
-    {{ paragraph }}
-  </p>
+        <template v-if="showFullText">
+          <p v-for="(paragraph, index) in remainingParagraphs" :key="'rest-' + index">
+            {{ paragraph }}
+          </p>
+        </template>
 
-  <template v-if="showFullText">
-
-    <p
-      v-for="(paragraph, index) in remainingParagraphs"
-      :key="'rest-' + index"
-    >
-      {{ paragraph }}
-    </p>
-
-  </template>
-
-  <q-btn
-    v-if="remainingParagraphs.length && !showFullText"
-    flat
-    style="color:var(--q-primary);"
-    label="Read full bio"
-    class="load-more-btn"
-    @click="showFullText = true"
-  />
-
-</div>
+        <q-btn
+          v-if="remainingParagraphs.length && !showFullText"
+          flat
+          style="color: var(--q-primary)"
+          label="Read full bio"
+          class="load-more-btn"
+          @click="showFullText = true"
+        />
+      </div>
 
       <!-- RIGHT -->
       <div class="member-info">
-
-          <div class="info-row">
+        <div class="info-row">
           <span>Date of Birth</span>
           <strong>{{ formatDate(member.birth_date) }}</strong>
         </div>
@@ -65,110 +44,76 @@
           <strong>{{ member.nationality }}</strong>
         </div>
 
-       <div v-if="member.role === 'driver' || member.role === 'reserve_driver'" class="info-row" >
-  <span>Driver Number</span>
-  <strong>#{{ member.driver_number }}</strong>
-</div>
-
+        <div v-if="member.role === 'driver' || member.role === 'reserve_driver'" class="info-row">
+          <span>Driver Number</span>
+          <strong>#{{ member.driver_number }}</strong>
+        </div>
       </div>
-
     </div>
 
     <!-- RACING HISTORY -->
-<div class="racing-section" v-if="racingHistory.length">
+    <div class="racing-section" v-if="racingHistory.length">
+      <h3 class="racing-title">EVERY YEAR IN RACING</h3>
 
-  <h3 class="racing-title">EVERY YEAR IN RACING</h3>
-
-  <!-- ARROWS -->
-  <div class="racing-arrows">
-
-    <div class="arrow-box" @click="prev">
-      <i class="fas fa-chevron-left"></i>
-    </div>
-
-    <div class="arrow-box" @click="next">
-      <i class="fas fa-chevron-right"></i>
-    </div>
-
-  </div>
-
-  <!-- CARDS -->
-  <div class="racing-wrapper">
-
-    <div class="racing-track" :style="{ transform: `translateX(-${currentIndex * 100}%)` }">
-
-      <div class="racing-group" v-for="(group, gIndex) in groupedHistory" :key="gIndex">
-
-        <div class="racing-card" v-for="item in group" :key="item.id">
-
-     <div class="racing-card-inner">
-
-  <div class="year-bar">
-    <span>{{ item.year }}</span>
-  </div>
-
-  <p class="race-text">
-    {{ item.description }}
-  </p>
-
-</div>
-
+      <!-- ARROWS -->
+      <div class="racing-arrows">
+        <div class="arrow-box" @click="prev">
+          <i class="fas fa-chevron-left"></i>
         </div>
 
+        <div class="arrow-box" @click="next">
+          <i class="fas fa-chevron-right"></i>
+        </div>
       </div>
 
+      <!-- CARDS -->
+      <div class="racing-wrapper">
+        <div class="racing-track" :style="{ transform: `translateX(-${currentIndex * 100}%)` }">
+          <div class="racing-group" v-for="(group, gIndex) in groupedHistory" :key="gIndex">
+            <div class="racing-card" v-for="item in group" :key="item.id">
+              <div class="racing-card-inner">
+                <div class="year-bar">
+                  <span>{{ item.year }}</span>
+                </div>
+
+                <p class="race-text">
+                  {{ item.description }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-  </div>
+    <!-- GALLERY -->
+    <div class="gallery-section" v-if="teamGallery.length">
+      <h4 class="gallery-subtitle">THROUGH THE YEARS</h4>
+      <h3 class="gallery-title">ON THE GRID</h3>
 
-</div>
-
-
-<!-- GALLERY -->
-<div class="gallery-section" v-if="teamGallery.length">
-
-  <h4 class="gallery-subtitle">THROUGH THE YEARS</h4>
-  <h3 class="gallery-title">ON THE GRID</h3>
-
-  <!-- ARROWS (iste kao gore) -->
-  <div class="gallery-arrows">
-
-    <div class="arrow-box" @click="prevGallery">
-      <i class="fas fa-chevron-left"></i>
-    </div>
-
-    <div class="arrow-box" @click="nextGallery">
-      <i class="fas fa-chevron-right"></i>
-    </div>
-
-  </div>
-
-  <!-- SLIDER -->
-  <div class="gallery-wrapper">
-
-    <div class="gallery-track"
-         :style="{ transform: `translateX(-${galleryIndex * 100}%)` }">
-
-      <div class="gallery-group"
-           v-for="(group, gIndex) in groupedGallery"
-           :key="gIndex">
-
-        <div class="gallery-item" v-for="img in group" :key="img.id">
-
-          <img :src="getImage(img.image)" />
-
+      <!-- ARROWS (iste kao gore) -->
+      <div class="gallery-arrows">
+        <div class="arrow-box" @click="prevGallery">
+          <i class="fas fa-chevron-left"></i>
         </div>
 
+        <div class="arrow-box" @click="nextGallery">
+          <i class="fas fa-chevron-right"></i>
+        </div>
       </div>
 
+      <!-- SLIDER -->
+      <div class="gallery-wrapper">
+        <div class="gallery-track" :style="{ transform: `translateX(-${galleryIndex * 100}%)` }">
+          <div class="gallery-group" v-for="(group, gIndex) in groupedGallery" :key="gIndex">
+            <div class="gallery-item" v-for="img in group" :key="img.id">
+              <img :src="getImage(img.image)" />
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-
-  </div>
-
-</div>
-
   </q-page>
-
 </template>
 
 <script setup>
@@ -192,9 +137,7 @@ const getImage = (path) => {
 }
 
 const loadMember = async () => {
-  const res = await axios.get(
-    `${api_url}/haas-team/${route.params.id}`
-  )
+  const res = await axios.get(`${api_url}/haas-team/${route.params.id}`)
 
   member.value = res.data
 }
@@ -202,9 +145,7 @@ const loadMember = async () => {
 const paragraphs = computed(() => {
   if (!member.value?.description) return []
 
-  return member.value.description
-    .split('\n')
-    .filter(p => p.trim() !== '')
+  return member.value.description.split('\n').filter((p) => p.trim() !== '')
 })
 
 /* PRIKAŽI PRVA 3 ODLOMKA */
@@ -255,7 +196,6 @@ onMounted(() => {
   loadRacingHistory()
 })
 
-
 const teamGallery = ref([])
 const galleryIndex = ref(0)
 
@@ -292,9 +232,7 @@ onMounted(() => {
 })
 </script>
 
-
 <style>
-
 .hero-section {
   position: relative;
   width: 100%;
@@ -312,9 +250,9 @@ onMounted(() => {
 
   background: linear-gradient(
     to top,
-    rgba(0,0,0,0.85) 0%,
-    rgba(0,0,0,0.55) 35%,
-    rgba(0,0,0,0) 65%
+    rgba(0, 0, 0, 0.85) 0%,
+    rgba(0, 0, 0, 0.55) 35%,
+    rgba(0, 0, 0, 0) 65%
   );
 }
 
@@ -340,16 +278,15 @@ onMounted(() => {
   text-align: justify;
 }
 
-
 .member-info {
   width: 320px; /* fiksna uža širina */
   flex-shrink: 0;
   background: var(--q-accent);
   padding: 35px;
-   padding-bottom: 20px;
+  padding-bottom: 20px;
   height: fit-content;
   margin-left: auto; /* gura karticu skroz desno */
-  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.10);
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
 }
 
 .info-row:last-child {
@@ -382,7 +319,6 @@ onMounted(() => {
   padding: 80px 70px;
   position: relative;
 }
-
 
 /* PROSTOR IZMEĐU NASLOVA I KARTICA (OVDJE SU STRELICE) */
 .racing-arrows {
@@ -444,8 +380,7 @@ onMounted(() => {
   width: calc((100% - 100px) / 3);
   flex-shrink: 0;
   background: var(--q-accent);
-  box-shadow: 0 4px 25px rgba(0,0,0,0.10);
-
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
 }
 
 /* UNUTRAŠNJOST */
@@ -456,7 +391,7 @@ onMounted(() => {
 
 /* YEAR BAR - LIJEVO, KRATKO */
 .year-bar {
-  width: 25%;           
+  width: 25%;
   height: 34px;
   background: var(--q-primary);
   display: flex;
@@ -475,12 +410,11 @@ onMounted(() => {
 
 /* TEKST ISPOD */
 .race-text {
-  font-size: 16px;  
+  font-size: 16px;
   line-height: 1.5;
   text-align: left;
   padding: 20px 20px 20px 20px;
 }
-
 
 .gallery-section {
   padding: 80px 70px;
@@ -524,6 +458,6 @@ onMounted(() => {
   height: auto;
   object-fit: contain;
   display: block;
-  box-shadow: 0 4px 25px rgba(0,0,0,0.10);
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
 }
 </style>

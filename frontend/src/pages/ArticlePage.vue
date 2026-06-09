@@ -1,13 +1,8 @@
 <template>
   <q-page v-if="article">
-
     <!-- HERO -->
     <div class="hero-section">
-
-      <img
-        :src="getImage(article.image_header)"
-        class="hero-image"
-      />
+      <img :src="getImage(article.image_header)" class="hero-image" />
 
       <div class="hero-overlay"></div>
 
@@ -15,12 +10,10 @@
         <h1>{{ article.short_title }}</h1>
         <h2>LATEST NEWS</h2>
       </div>
-
     </div>
 
     <!-- ARTICLE -->
     <div class="article-content">
-
       <h4>FIND OUT MORE</h4>
 
       <h3>
@@ -28,42 +21,21 @@
       </h3>
 
       <div class="article-date">
-        {{
-          new Date(article.published_at)
-            .toLocaleDateString('en-GB')
-        }}
+        {{ new Date(article.published_at).toLocaleDateString('en-GB') }}
       </div>
 
       <div class="article-text">
-       <p> {{ article.text }} </p>
+        <p>{{ article.text }}</p>
       </div>
 
-       <div
-  v-if="isAdmin"
-  class="admin-actions"
->
+      <div v-if="isAdmin" class="admin-actions">
+        <router-link :to="`/editArticle/${article.id_article}`" class="admin-btn edit-btn">
+          EDIT ARTICLE
+        </router-link>
 
-  <router-link
-    :to="`/editArticle/${article.id_article}`"
-    class="admin-btn edit-btn"
-  >
-    EDIT ARTICLE
-  </router-link>
-
-  <button
-    @click="deleteArticle"
-    class="admin-btn delete-btn"
-  >
-    DELETE ARTICLE
-  </button>
-
-</div>
-
+        <button @click="deleteArticle" class="admin-btn delete-btn">DELETE ARTICLE</button>
+      </div>
     </div>
-
-    
-
-
   </q-page>
 </template>
 
@@ -86,18 +58,13 @@ const getImage = (path) => {
 
 const loadArticle = async () => {
   try {
-
-    const res = await axios.get(
-      `${api_url}/articles/${route.params.id}`
-    )
+    const res = await axios.get(`${api_url}/articles/${route.params.id}`)
 
     article.value = res.data
-
   } catch (err) {
     console.error(err)
   }
 }
-
 
 const isAdmin = ref(false)
 
@@ -110,18 +77,13 @@ const checkAdmin = () => {
 }
 
 const deleteArticle = async () => {
-
   if (!confirm('Delete this article?')) return
 
   try {
-
-    await axios.delete(
-      `${api_url}/articles/${route.params.id}`
-    )
+    await axios.delete(`${api_url}/articles/${route.params.id}`)
 
     // nakon brisanja → redirect
     router.push('/articles')
-
   } catch (err) {
     console.error(err)
   }
@@ -134,7 +96,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-
 /* HERO */
 .hero-section {
   position: relative;
@@ -153,9 +114,9 @@ onMounted(() => {
 
   background: linear-gradient(
     to top,
-    rgba(0,0,0,0.85) 0%,
-    rgba(0,0,0,0.55) 35%,
-    rgba(0,0,0,0) 65%
+    rgba(0, 0, 0, 0.85) 0%,
+    rgba(0, 0, 0, 0.55) 35%,
+    rgba(0, 0, 0, 0) 65%
   );
 }
 
@@ -166,7 +127,6 @@ onMounted(() => {
   z-index: 2;
   text-transform: uppercase;
 }
-
 
 /* CONTENT */
 .article-content {
@@ -218,5 +178,4 @@ onMounted(() => {
 .admin-btn:hover {
   opacity: 0.85;
 }
-
 </style>

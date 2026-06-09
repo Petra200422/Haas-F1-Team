@@ -1,30 +1,16 @@
 <template>
   <q-page class="article-page">
-
     <div class="article-background"></div>
 
     <div class="article-container">
-
       <div class="article-content">
-
         <h3>NEW ARTICLE</h3>
         <h4>INSERT INFORMATIONS</h4>
 
         <q-form @submit.prevent="submitArticle" class="article-form">
+          <q-input v-model="form.short_title" label="Short title" outlined class="article-input" />
 
-          <q-input
-            v-model="form.short_title"
-            label="Short title"
-            outlined
-            class="article-input"
-          />
-
-          <q-input
-            v-model="form.long_title"
-            label="Long title"
-            outlined
-            class="article-input"
-          />
+          <q-input v-model="form.long_title" label="Long title" outlined class="article-input" />
 
           <q-input
             v-model="form.text"
@@ -70,13 +56,9 @@
             :loading="loading"
             class="article-btn"
           />
-
         </q-form>
-
       </div>
-
     </div>
-
   </q-page>
 </template>
 
@@ -102,9 +84,8 @@ const form = ref({
   short_title: '',
   long_title: '',
   text: '',
-  published_at: ''
+  published_at: '',
 })
-
 
 // SUBMIT
 const submitArticle = async () => {
@@ -129,17 +110,15 @@ const submitArticle = async () => {
 
     await axios.post(`${api_url}/articles`, fd, {
       headers: {
-        'Authorization': `Bearer ${token}` // 🔥 BITNO
+        Authorization: `Bearer ${token}`, // 🔥 BITNO
         // ❗ NE STAVLJAJ Content-Type RUČNO - axios to sam riješi za FormData
-      }
+      },
     })
 
     router.push('/articles')
-
   } catch (err) {
     console.error(err)
-    error.value =
-      err.response?.data?.message || 'Error creating article'
+    error.value = err.response?.data?.message || 'Error creating article'
   } finally {
     loading.value = false
   }
@@ -147,7 +126,6 @@ const submitArticle = async () => {
 </script>
 
 <style scoped>
-
 .article-page {
   min-height: 100vh;
   position: relative;
@@ -214,5 +192,4 @@ const submitArticle = async () => {
   color: #d32f2f;
   font-size: 14px;
 }
-
 </style>

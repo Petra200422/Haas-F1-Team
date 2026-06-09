@@ -1,9 +1,7 @@
 <template>
   <q-page class="partners-page">
-
     <!-- HEADER -->
     <div class="page-header partners-header">
-
       <div class="header-left">
         <h1>PARTNERS</h1>
         <h2>2026</h2>
@@ -11,33 +9,28 @@
 
       <div class="header-right">
         <p>
-          The Haas F1 Team partners with leading global brands to compete at the highest level of motorsport, combining engineering innovation, performance, and teamwork in the pursuit of stronger results. Through collaboration and shared ambition, these partnerships help drive continuous development both on and off the track.
+          The Haas F1 Team partners with leading global brands to compete at the highest level of
+          motorsport, combining engineering innovation, performance, and teamwork in the pursuit of
+          stronger results. Through collaboration and shared ambition, these partnerships help drive
+          continuous development both on and off the track.
         </p>
       </div>
-
     </div>
 
     <div class="divider"></div>
 
     <div class="partners-section">
-
-  <div
-    class="partner-row"
-    v-for="(row, index) in groupedPartners"
-    :key="index"
-  >
-    <router-link
-      v-for="partner in row"
-      :key="partner.id_partner"
-      :to="`/partner/${partner.id_partner}`"
-      class="partner-card"
-    >
-      <img :src="getImage(partner.logo)" />
-    </router-link>
-  </div>
-
-</div>
-
+      <div class="partner-row" v-for="(row, index) in groupedPartners" :key="index">
+        <router-link
+          v-for="partner in row"
+          :key="partner.id_partner"
+          :to="`/partner/${partner.id_partner}`"
+          class="partner-card"
+        >
+          <img :src="getImage(partner.logo)" />
+        </router-link>
+      </div>
+    </div>
   </q-page>
 </template>
 
@@ -86,8 +79,6 @@ const groupedPartners = computed(() => {
 })
 
 onMounted(loadPartners)
-
-
 </script>
 
 <style scoped>
@@ -150,7 +141,7 @@ onMounted(loadPartners)
 }
 
 /* svi ostali redovi (6 po redu) */
-.partner-row:nth-child(n+3) {
+.partner-row:nth-child(n + 3) {
   flex-wrap: wrap;
 }
 

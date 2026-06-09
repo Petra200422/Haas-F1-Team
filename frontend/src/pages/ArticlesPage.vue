@@ -1,20 +1,20 @@
 <template>
   <q-page class="articles-page">
-
     <!-- HEADER (ISTO KAO PARTNERS) -->
     <div class="partners-header">
-
       <div class="header-left">
         <h1>ALL THE LATEST</h1>
         <h2>BREAKING NEWS</h2>
       </div>
 
       <div class="header-right">
-        <p>The Haas F1 Team competes at the highest level of motorsport, constantly pushing for stronger performances and better results.
-        Stay up to date with the latest news, race updates, and team insights as Haas takes on the challenges of Formula 1 and fights for every point on the grid.
-      </p>
+        <p>
+          The Haas F1 Team competes at the highest level of motorsport, constantly pushing for
+          stronger performances and better results. Stay up to date with the latest news, race
+          updates, and team insights as Haas takes on the challenges of Formula 1 and fights for
+          every point on the grid.
+        </p>
       </div>
-
     </div>
 
     <!-- DIVIDER -->
@@ -22,94 +22,58 @@
 
     <!-- FILTER -->
     <div class="filter-row">
-
-      <div
-        class="year-box"
-        :class="{ active: selectedYear === null }"
-        @click="setYear(null)"
-      >
+      <div class="year-box" :class="{ active: selectedYear === null }" @click="setYear(null)">
         ALL
       </div>
 
-      <div
-        class="year-box"
-        :class="{ active: selectedYear === 2026 }"
-        @click="setYear(2026)"
-      >
+      <div class="year-box" :class="{ active: selectedYear === 2026 }" @click="setYear(2026)">
         2026
       </div>
 
-      <div
-        class="year-box"
-        :class="{ active: selectedYear === 2025 }"
-        @click="setYear(2025)"
-      >
+      <div class="year-box" :class="{ active: selectedYear === 2025 }" @click="setYear(2025)">
         2025
       </div>
 
-      <div
-        class="year-box"
-        :class="{ active: selectedYear === 2024 }"
-        @click="setYear(2024)"
-      >
+      <div class="year-box" :class="{ active: selectedYear === 2024 }" @click="setYear(2024)">
         2024
       </div>
-
     </div>
 
     <!-- ADD NEW BUTTON (ADMIN ONLY) -->
-<div v-if="isAdmin" class="add-new-wrap">
-
-  <router-link
-    to="/newArticle"
-    class="add-new-btn"
-  >
-    + ADD NEW
-  </router-link>
-
-</div>
-
-   <!-- ARTICLES -->
-<div class="articles-grid">
-
-  <router-link
-    v-for="article in visibleArticles"
-    :key="article.id_article"
-    :to="`/article/${article.id_article}`"
-    class="article-card"
-  >
-
-    <img
-      :src="getImage(article.image_profile)"
-      class="article-img"
-    />
-
-    <div class="article-date">
-      {{ formatDate(article.published_at) }}
+    <div v-if="isAdmin" class="add-new-wrap">
+      <router-link to="/newArticle" class="add-new-btn"> + ADD NEW </router-link>
     </div>
 
-    <div class="article-title">
-      {{ article.long_title }}
+    <!-- ARTICLES -->
+    <div class="articles-grid">
+      <router-link
+        v-for="article in visibleArticles"
+        :key="article.id_article"
+        :to="`/article/${article.id_article}`"
+        class="article-card"
+      >
+        <img :src="getImage(article.image_profile)" class="article-img" />
+
+        <div class="article-date">
+          {{ formatDate(article.published_at) }}
+        </div>
+
+        <div class="article-title">
+          {{ article.long_title }}
+        </div>
+      </router-link>
     </div>
-
-  </router-link>
-
-</div>
 
     <!-- LOAD MORE -->
     <div class="load-more-wrap" v-if="canLoadMore">
-      <button class="load-more" @click="loadMore">
-        LOAD MORE
-      </button>
+      <button class="load-more" @click="loadMore">LOAD MORE</button>
     </div>
-
   </q-page>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
-
 
 const api_url = import.meta.env.VITE_API_URL
 
@@ -121,9 +85,7 @@ const loadArticles = async () => {
   const res = await axios.get(`${api_url}/articles`)
 
   // SORTIRANJE OD NAJNOVIJEG
-  articles.value = res.data.sort(
-    (a, b) => new Date(b.published_at) - new Date(a.published_at)
-  )
+  articles.value = res.data.sort((a, b) => new Date(b.published_at) - new Date(a.published_at))
 }
 
 const getImage = (path) => {
@@ -139,9 +101,7 @@ const formatDate = (date) => {
 const filteredArticles = computed(() => {
   if (!selectedYear.value) return articles.value
 
-  return articles.value.filter(a =>
-    new Date(a.published_at).getFullYear() === selectedYear.value
-  )
+  return articles.value.filter((a) => new Date(a.published_at).getFullYear() === selectedYear.value)
 })
 
 /* VISIBLE */
@@ -178,7 +138,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-
 /* HEADER (KAO PARTNERS) */
 .articles-page {
   padding: 80px 70px;
@@ -231,7 +190,7 @@ onMounted(() => {
 }
 
 .year-box:hover {
-  background: rgba(0,0,0,0.05);
+  background: rgba(0, 0, 0, 0.05);
 }
 
 .year-box.active {
@@ -271,8 +230,8 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  text-decoration: none;   /* 🔥 uklanja underline */
-  color: black;            /* 🔥 da izgleda kao tekst, ne link */
+  text-decoration: none; /* 🔥 uklanja underline */
+  color: black; /* 🔥 da izgleda kao tekst, ne link */
   cursor: pointer;
   transition: transform 0.25s ease;
 }
@@ -290,7 +249,7 @@ onMounted(() => {
 .article-date {
   font-size: 13px;
   color: #777;
-  font-family: "IBM Plex Sans", sans-serif; /* 🔥 isti font kao ostatak */
+  font-family: 'IBM Plex Sans', sans-serif; /* 🔥 isti font kao ostatak */
   font-weight: 400;
 }
 
@@ -298,7 +257,7 @@ onMounted(() => {
 .article-title {
   font-size: 18px;
   font-weight: 500;
-  font-family: "IBM Plex Sans", sans-serif; /* 🔥 ujednačeno */
+  font-family: 'IBM Plex Sans', sans-serif; /* 🔥 ujednačeno */
   line-height: 1.4;
 }
 
@@ -307,7 +266,7 @@ onMounted(() => {
   width: 100%;
   height: auto;
   object-fit: contain;
-  box-shadow: 0 4px 25px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
 }
 
 /* LOAD MORE */
@@ -329,5 +288,4 @@ onMounted(() => {
 .load-more:hover {
   opacity: 0.85;
 }
-
 </style>
