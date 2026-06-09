@@ -36,7 +36,7 @@
               :class="{ active: useMyTimezone }"
               @click="useMyTimezone = !useMyTimezone"
             >
-              {{ useMyTimezone ? 'MY TIMEZONE' : 'LOCAL TIME' }}
+              {{ useMyTimezone ? 'SHOW LOCAL TIME' : 'SHOW MY TIME' }}
             </button>
           </div>
           <table>
@@ -146,11 +146,11 @@
       <h3 class="gallery-title">GALLERY</h3>
 
       <div class="gallery-arrows">
-        <div class="arrow-box" @click="prevGallery">
+        <div class="gallery-arrow" @click="prevGallery">
           <i class="fas fa-chevron-left"></i>
         </div>
 
-        <div class="arrow-box" @click="nextGallery">
+        <div class="gallery-arrow" @click="nextGallery">
           <i class="fas fa-chevron-right"></i>
         </div>
       </div>
@@ -298,7 +298,6 @@ const prevGallery = () => {
 
 onMounted(() => {
   loadRace()
-  loadSessions()
 })
 </script>
 
@@ -527,6 +526,33 @@ onMounted(() => {
   justify-content: flex-end;
   gap: 12px;
   margin: 20px 0 40px;
+}
+
+.gallery-arrow {
+  width: 55px;
+  height: 32px;
+  background: var(--q-primary);
+  border: 1px solid var(--q-primary);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.gallery-arrow:hover {
+  background: transparent;
+}
+
+.gallery-arrow i {
+  color: white;
+  transition: 0.25s ease;
+}
+
+.gallery-arrow:hover i {
+  color: var(--q-primary);
 }
 
 .gallery-wrapper {
