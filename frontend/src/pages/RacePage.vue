@@ -144,9 +144,9 @@
     <!-- GALLERY -->
 
     <div class="gallery-section" v-if="circuitGallery.length">
-      <h4 class="gallery-subtitle">THROUGH THE CIRCUIT</h4>
+      <h4 class="gallery-subtitle">MEMORIES FROM</h4>
 
-      <h3 class="gallery-title">GALLERY</h3>
+      <h3 class="gallery-title">THE TRACK</h3>
 
       <div class="gallery-arrows">
         <div class="gallery-arrow" @click="prevGallery">

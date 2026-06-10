@@ -11,13 +11,14 @@
   />
 
   <q-layout view="hhh Lpr lff">
-    <!-- NAV -->
+    <!-- NAVIGACIJA koja je fiksna na stranici, logo i linkovi na sve glavne stranice -->
     <q-header class="nav">
       <div class="nav-inner">
         <router-link to="/">
-          <img :src="logo" class="logo" />
+          <img :src="logo" class="logo" /> <!-- vodi na početnu stranicu -->
         </router-link>
-
+        
+        <!-- linkovi na ostakle glavne stranice -->
         <div class="links">
           <q-btn flat to="/team" label="Team" class="nav-text" />
           <q-btn flat to="/car" label="Car" class="nav-text" />
@@ -27,6 +28,7 @@
           <q-btn flat to="/partners" label="Partners" class="nav-text" />
           <q-btn flat to="/contact" label="Contact" class="nav-text" />
 
+          <!-- logout koji se prikazuje ako je prijavljen admin-->
           <q-btn v-if="isAdmin" flat class="logout-btn" @click="logout">
             <i class="fa-solid fa-right-from-bracket"></i>
           </q-btn>
@@ -34,12 +36,12 @@
       </div>
     </q-header>
 
-    <!-- LOADER OVERLAY (NE blokira sadržaj) -->
+    <!-- učitavanje stranice koje se prikazuje prije samog sadržaja -->
     <div v-if="loading" class="global-loader">
       <div class="spinner"></div>
     </div>
 
-    <!-- PAGE -->
+    <!-- mjesto gdje se učitava stranica -->
     <q-page-container>
       <router-view />
     </q-page-container>
@@ -47,6 +49,7 @@
     <!-- FOOTER -->
     <div class="footer">
       <div class="footer-inner">
+        <!-- stupac gdje je logo i tekst o timu -->
         <div class="footer-col footer-about">
           <router-link to="/">
             <img :src="logo" class="logo-footer" />
@@ -59,6 +62,7 @@
           </p>
         </div>
 
+        <!-- stpac gdje su linkovi tj. navigacija-->
         <div class="footer-col footer-nav">
           <div class="footer-nav-col">
             <router-link to="/team">Team</router-link>
@@ -71,10 +75,11 @@
             <router-link to="/articles">Articles</router-link>
             <router-link to="/partners">Partners</router-link>
             <router-link to="/contact">Contact</router-link>
-            <router-link v-if="!isAdmin" to="/adminLogin"> Admin </router-link>
+            <router-link v-if="!isAdmin" to="/adminLogin"> Admin </router-link> <!-- admin se prikazuje samo ako već nije prijavljen -->
           </div>
         </div>
 
+        <!-- stupac gdje su društvene mreže-->
         <div class="footer-col footer-social">
           <a href="https://www.instagram.com/haasf1team/" target="_blank"
             ><i class="fa-brands fa-instagram"></i>Instagram</a
@@ -103,26 +108,34 @@ import { useRouter } from 'vue-router'
 import logo from 'src/assets/Logo-Navigacija.png'
 
 const router = useRouter()
-const loading = ref(false)
 
+const loading = ref(false) // prikaz učitavanja
+
+const isAdmin = ref(false) //provjerava se je li admin prijavljen
+
+
+// pokreće učitavanje prije svake promjene stranice dok s ene učita sadržaj
 router.beforeEach(() => {
   loading.value = true
 })
 
+// učitavanje se miče nakon 300 ms
 router.afterEach(() => {
   setTimeout(() => {
     loading.value = false
-  }, 250)
+  }, 300)
 })
 
-const isAdmin = ref(false)
 
+// funkcija provjerava je li admin prijavljen iz local storage
 const checkAdmin = () => {
   const user = JSON.parse(localStorage.getItem('user'))
 
   isAdmin.value = user && user.role === 'admin'
 }
 
+
+// kada se stranica učita, provjerava je li admin prijavljen i prikazuje ono što treba
 onMounted(() => {
   checkAdmin()
 
@@ -131,12 +144,15 @@ onMounted(() => {
   window.addEventListener('admin-logout', checkAdmin)
 })
 
+
+// kada je stranica promijeni, briše event listener da se ne gomilaju
 onUnmounted(() => {
   window.removeEventListener('admin-login', checkAdmin)
 
   window.removeEventListener('admin-logout', checkAdmin)
 })
 
+// funkcija za logout admina, briše korisnika iz locak storage i vraća na početnu stranicu
 const logout = () => {
   localStorage.removeItem('user')
 
@@ -147,27 +163,8 @@ const logout = () => {
 </script>
 
 <style scoped>
-/* =======================
-   PAGE TRANSITION
-======================= */
-.page-enter-active,
-.page-leave-active {
-  transition: all 0.5s ease;
-}
 
-.page-enter-from {
-  opacity: 0;
-  transform: translateY(12px);
-}
-
-.page-leave-to {
-  opacity: 0;
-  transform: translateY(-12px);
-}
-
-/* =======================
-   GLOBAL LOADER
-======================= */
+/* overlay koji se prikazuje tijekom učitavanja */
 .global-loader {
   position: fixed;
   inset: 0;
@@ -175,36 +172,37 @@ const logout = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 99999;
+  z-index: 99999; /* da bude iznad svih elemanata */
 }
 
+/* krug koji se vrti */
 .spinner {
   width: 45px;
   height: 45px;
   border: 4px solid #ddd;
   border-top: 4px solid var(--q-primary);
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  animation: spin 0.8s linear infinite; /* neprekidna rotacija */
 }
 
+/* animacija rotacije */
 @keyframes spin {
   to {
     transform: rotate(360deg);
   }
 }
 
-/* =======================
-   NAV
-======================= */
+/* navigacija */
 .nav {
   background: white;
-  position: fixed;
+  position: fixed; /* stoji na vrhu dok se scrola */
   top: 15px;
   margin: 15px 55px 0 55px;
   box-shadow: 0 4px 25px rgba(0, 0, 0, 0.12);
   z-index: 9999;
 }
 
+/* raspored unutar navigacije */
 .nav-inner {
   display: flex;
   justify-content: space-between;
@@ -212,11 +210,13 @@ const logout = () => {
   padding: 10px 30px;
 }
 
+/* mjesto gdje su svi linkovi */
 .links {
   display: flex;
   gap: 5px;
 }
 
+/* izgled linkova */
 .nav-text {
   text-transform: none;
   font-size: medium;
@@ -228,10 +228,12 @@ const logout = () => {
   color: var(--q-primary);
 }
 
+/* miče focus efetk */
 :deep(.q-focus-helper) {
   display: none;
 }
 
+/* logo u navigaciji */
 .logo {
   height: 55px;
   width: auto;
@@ -240,6 +242,7 @@ const logout = () => {
   margin-top: 5px;
 }
 
+/* logout ikona */
 .logout-btn {
   color: black;
   font-size: 18px;
@@ -249,13 +252,12 @@ const logout = () => {
   color: var(--q-primary);
 }
 
+/* miče automatki razmak iznad sadržaja */
 .q-page-container {
   padding-top: 0 !important;
 }
 
-/* =======================
-   FOOTER
-======================= */
+/* footer */
 .footer {
   background: var(--q-secondary);
   color: black;
@@ -264,6 +266,7 @@ const logout = () => {
   margin-top: auto;
 }
 
+/* raspored unutar footera */
 .footer-inner {
   display: flex;
   justify-content: space-between;
@@ -272,10 +275,12 @@ const logout = () => {
   align-items: stretch;
 }
 
+/* stupac sa opisom tima */
 .footer-about {
-  flex: 2;
+  flex: 2; /* više prostora nego drugi */
 }
 
+/* stil za sve stupce */
 .footer-col {
   display: flex;
   flex-direction: column;
@@ -283,10 +288,12 @@ const logout = () => {
   padding: 0 20px;
 }
 
+/* linija između stupaca */
 .footer-col:not(:last-child) {
   border-right: 1px solid rgba(0, 0, 0, 0.3);
 }
 
+/* tekst opisa u footeru */
 .footer-text {
   font-size: 14px;
   line-height: 1.5;
@@ -295,6 +302,7 @@ const logout = () => {
   font-weight: 400;
 }
 
+/* kontenjer sa linkovima navigacije */
 .footer-nav {
   display: flex;
   flex-direction: row;
@@ -302,6 +310,7 @@ const logout = () => {
   gap: 40px;
 }
 
+/* stupac sa linkovima navigacije */
 .footer-nav-col {
   display: flex;
   flex-direction: column;
@@ -309,6 +318,7 @@ const logout = () => {
   min-width: 120px;
 }
 
+/* stil linkova u footeru */
 .footer a {
   text-decoration: none;
   color: black;
@@ -322,11 +332,13 @@ const logout = () => {
   color: var(--q-primary);
 }
 
+/* ikone za društvene mreže */
 .footer i {
   font-size: 20px;
   margin-right: 8px;
 }
 
+/* logo u footeru */
 .logo-footer {
   height: 60px;
   width: 200px;
