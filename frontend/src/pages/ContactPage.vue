@@ -1,6 +1,5 @@
 <template>
   <q-page class="contact-page">
-    <!-- HERO -->
     <section class="hero-section">
       <h4>HOW TO GET IN TOUCH WITH</h4>
       <h3>TGR HAAS F1 TEAM</h3>
@@ -14,7 +13,7 @@
 
     <q-separator color="primary" />
 
-    <!-- HEADQUARTERS -->
+    <!-- sekcija sa adresama -->
     <section class="section">
       <h4>HEADQUARTERS</h4>
       <h3>ADDRESSES</h3>
@@ -60,8 +59,8 @@
 
     <q-separator color="primary" />
 
-    <!-- PARTNERSHIPS -->
-    <section class="section alternate">
+    <!-- sekcija za postati partner -->
+    <section class="section partnership-section">
       <h4>NEW</h4>
       <h3>PARTNERSHIPS</h3>
 
@@ -70,7 +69,7 @@
         Development team:
       </p>
 
-      <a class="contact-link"> partnerships@haas.com </a>
+      <a class="contact-link" href="mailto:partnerships@haas.com"> partnerships@haas.com </a>
     </section>
   </q-page>
 </template>
@@ -103,22 +102,20 @@ h3 {
   line-height: 1.7;
 }
 
-/* PRIMARY SEPARATOR */
+/* quasar separator koji vizualno odvaja sekcije */
 .q-separator {
   height: 3px;
 }
 
-/* SECTIONS */
 .section {
   padding: 60px 0;
 }
 
-/* SECONDARY BACKGROUND */
-.alternate {
+.partnership-section {
   padding: 80px 40px 60px 40px;
-  color: white;
 }
 
+/* grid raspored kartica s adresama */
 .address-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -126,27 +123,19 @@ h3 {
   margin-top: 30px;
 }
 
-/* SECONDARY CARDS */
+/* kartica zasebne adrese tima */
 .address-card {
   background: var(--q-accent);
   height: 100%;
   box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
 }
 
-/* DRŽAVA */
+/* ime države u kartici */
 .address-card h5 {
   font-size: 18px;
   font-weight: 700;
   margin-bottom: 15px;
-  color: rgb(0, 0, 0);
-}
-
-.faq-item {
-  margin-bottom: 40px;
-}
-
-.faq-item h5 {
-  margin-bottom: 10px;
+  color: black;
 }
 
 p {

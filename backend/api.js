@@ -620,7 +620,8 @@ app.put(
   (req, res) => {
     const articleId = req.params.id;
 
-    const { short_title, long_title, text, published_at } = req.body;
+    // Datum objave se ne dohvaća jer se ne mijenja prilikom uređivanja članka
+    const { short_title, long_title, text } = req.body;
 
     if (!short_title || !long_title || !text) {
       return res.status(400).json({
@@ -629,7 +630,7 @@ app.put(
       });
     }
 
-    // 🔥 NEW FILE PATHS (ako postoje)
+    // Putanje novih slika, ako su nove slike odabrane u formi
     const newProfile = req.files?.image_profile?.[0]
       ? `uploads/Article/Profile/${req.files.image_profile[0].filename}`
       : null;
@@ -638,7 +639,7 @@ app.put(
       ? `uploads/Article/Header/${req.files.image_header[0].filename}`
       : null;
 
-    // 🔥 get old data
+    // Dohvaćaju se stare slike kako bi se mogle zadržati ili obrisati ako su zamijenjene
     db.query(
       `SELECT image_profile, image_header FROM Articles WHERE id_article = ?`,
       [articleId],
@@ -659,24 +660,21 @@ app.put(
 
         const old = result[0];
 
+        // Ako je učitana nova profile slika, stara se briše iz uploads foldera
         if (newProfile && old.image_profile) {
           deleteFile(old.image_profile);
         }
 
+        // Ako je učitana nova header slika, stara se briše iz uploads foldera
         if (newHeader && old.image_header) {
           deleteFile(old.image_header);
         }
 
-        // 🔥 FINAL VALUES (keep old if no new upload)
+        // Ako nova slika nije učitana, zadržava se postojeća putanja stare slike
         const finalProfile = newProfile || old.image_profile;
         const finalHeader = newHeader || old.image_header;
 
-        // 🔥 DELETE OLD FILES IF REPLACED
-        if (newProfile && old.image_profile) {
-          deleteFile(old.image_profile);
-        }
-
-        // 🔥 UPDATE DB
+        // Ažuriraju se samo podaci koji se smiju mijenjati
         db.query(
           `
           UPDATE Articles
@@ -685,8 +683,7 @@ app.put(
             long_title = ?,
             text = ?,
             image_profile = ?,
-            image_header = ?,
-            published_at = ?
+            image_header = ?
           WHERE id_article = ?
           `,
           [
@@ -695,7 +692,6 @@ app.put(
             text,
             finalProfile,
             finalHeader,
-            published_at,
             articleId,
           ],
           (err2) => {
