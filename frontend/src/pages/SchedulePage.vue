@@ -1,11 +1,13 @@
 <template>
   <q-page class="schedule-page">
-    <div class="partners-header">
+    <div class="schedule-header">
+      <!-- naslov lijevo --> 
       <div class="header-left">
         <h1>SCHEDULE</h1>
         <h2>2026</h2>
       </div>
 
+      <!-- tekst desno --> 
       <div class="header-right">
         <p>
           Find out where TGR Haas F1 Team will be racing during the 2026 Formula 1 season, as a new
@@ -17,9 +19,12 @@
       </div>
     </div>
 
-    <div class="divider"></div>
+    <div class="divider"></div> <!-- crta za razdvajanje sekcija --> 
 
+    <!-- grid sa karticama utrka --> 
     <div class="races-grid">
+      
+      <!-- vodi na stranicu te utrke --> 
       <router-link
         v-for="race in races"
         :key="race.id_race"
@@ -27,12 +32,14 @@
         class="race-card"
         :class="{ finished: isFinishedRace(race.date_end) }"
       >
-        <img :src="getImage(race.image_profile)" class="race-img" />
+        <img :src="getImage(race.image_profile)" class="race-img" /> <!-- slika --> 
 
+        <!-- datum trajanaj --> 
         <div class="race-date">
           {{ formatRaceDate(race.date_start, race.date_end) }}
         </div>
 
+        <!-- ime --> 
         <div class="race-title">
           {{ race.race_name }}
         </div>
@@ -45,16 +52,17 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 
-const api_url = import.meta.env.VITE_API_URL
+const api_url = import.meta.env.VITE_API_URL // url backend apija u .env datoteci
 
-const races = ref([])
+const races = ref([]) // sprema sve utrke iz baze
 
+// prima outanju slike iz baze i pretvara u url na backendu
 const getImage = (path) => {
   if (!path) return ''
   return `${api_url}/${encodeURI(path)}`
 }
 
-// 👇 OVDJE DODAJ
+// funkcija formatira datum utrke, uzima originalni datum i pretvara ga u kreći sa riječima
 const formatRaceDate = (start, end) => {
   const startDate = new Date(start)
   const endDate = new Date(end)
@@ -80,30 +88,35 @@ const formatRaceDate = (start, end) => {
   const startMonth = months[startDate.getMonth()]
   const endMonth = months[endDate.getMonth()]
 
+  // ako je isti mjesec
   if (startMonth === endMonth) {
     return `${startDay} - ${endDay} ${startMonth}`
   }
 
+  // ako je različiti mjesec
   return `${startDay} ${startMonth} - ${endDay} ${endMonth}`
 }
 
+// funkcija koja provjerava je li utrka završila i ako je označava se kao finished
 const isFinishedRace = (dateEnd) => {
   if (!dateEnd) return false
 
   const today = new Date()
 
-  today.setHours(0, 0, 0, 0)
+  today.setHours(0, 0, 0, 0) //postavlja vrijeme na 0,0,0,0 pa se gleda samo datum
 
   const raceEnd = new Date(dateEnd)
 
   return raceEnd < today
 }
 
+// funkcija dohvaća sev utrke iz baze podataka
 const loadRaces = async () => {
   const res = await axios.get(`${api_url}/schedule-races`)
   races.value = res.data
 }
 
+// nakon učitavanja prikazuju se utrke
 onMounted(loadRaces)
 </script>
 
@@ -112,7 +125,8 @@ onMounted(loadRaces)
   padding: 80px 70px;
 }
 
-.partners-header {
+/* sekcija sa naslovom lijevo i tekson desno */
+.schedule-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -134,6 +148,7 @@ onMounted(loadRaces)
   text-align: justify;
 }
 
+/* crta */
 .divider {
   height: 30px;
   background: var(--q-primary);
@@ -142,12 +157,14 @@ onMounted(loadRaces)
   margin-right: calc(-50vw + 50%);
 }
 
+/* grid kartica utrka, 4 u redu */
 .races-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 40px;
 }
 
+/* zasebna kartica */
 .race-card {
   display: flex;
   flex-direction: column;
@@ -166,6 +183,7 @@ onMounted(loadRaces)
   color: var(--q-primary);
 }
 
+/* slika utrke u punoj širini */
 .race-img {
   width: 100%;
   height: auto;
@@ -173,18 +191,21 @@ onMounted(loadRaces)
   box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
 }
 
+/* datum */
 .race-date {
   font-size: 14px;
   color: black;
   font-weight: 700;
 }
 
+/* naslov */
 .race-title {
   font-size: 18px;
   font-weight: 500;
   line-height: 1.4;
 }
 
+/* ako je utrka prošla */
 .finished .race-img {
   filter: brightness(50%);
 }

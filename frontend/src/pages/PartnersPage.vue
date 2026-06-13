@@ -1,12 +1,13 @@
 <template>
   <q-page class="partners-page">
-    <!-- HEADER -->
     <div class="page-header partners-header">
+      <!-- lijevo dio gornje sekcije -->
       <div class="header-left">
         <h1>PARTNERS</h1>
         <h2>2026</h2>
       </div>
 
+      <!-- desni dio gornje sekcije sa tekstom -->
       <div class="header-right">
         <p>
           The Haas F1 Team partners with leading global brands to compete at the highest level of
@@ -17,10 +18,14 @@
       </div>
     </div>
 
-    <div class="divider"></div>
+    <div class="divider"></div> <!-- razdvanaj sekcije -->
 
+    <!-- sekcija s asvim logotipima partnera -->
     <div class="partners-section">
+      <!-- grupirani u redove -->
       <div class="partner-row" v-for="(row, index) in groupedPartners" :key="index">
+       
+        <!-- logo vodi na stranicu o tom partneru -->
         <router-link
           v-for="partner in row"
           :key="partner.id_partner"
@@ -38,20 +43,22 @@
 import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
 
-const api_url = import.meta.env.VITE_API_URL
-const partners = ref([])
+const api_url = import.meta.env.VITE_API_URL // url backend apija u .env datoteci
+const partners = ref([]) // sprema sve partnere iz baze podataka
 
+// funkcija prima putanje slike iz baze i pretvara ih u url do slike
 const getImage = (path) => {
   if (!path) return ''
   return `${api_url}/${encodeURI(path)}`
 }
 
+// funckija dihvaća popis svih parthera iz baze
 const loadPartners = async () => {
   const res = await axios.get(`${api_url}/partners`)
   partners.value = res.data
 }
 
-/* 🔥 GROUPING: 1 → 2 → 6 */
+/* grupiranje partnera u redove, 1-3-6 */
 const groupedPartners = computed(() => {
   const groups = []
 
@@ -69,7 +76,7 @@ const groupedPartners = computed(() => {
     i += 3
   }
 
-  // ostali redovi (6 po redu)
+  // ostali redovi 
   while (i < partners.value.length) {
     groups.push(partners.value.slice(i, i + 6))
     i += 6
@@ -78,6 +85,7 @@ const groupedPartners = computed(() => {
   return groups
 })
 
+// dohvaćaju se partneri
 onMounted(loadPartners)
 </script>
 
@@ -86,7 +94,7 @@ onMounted(loadPartners)
   padding: 80px 70px;
 }
 
-/* HEADER */
+/* sekcija s anaslvoom lijevo a teksom desno */
 .partners-header {
   display: flex;
   justify-content: space-between;
@@ -109,22 +117,23 @@ onMounted(loadPartners)
   text-align: justify;
 }
 
-/* DIVIDER */
+/* crta */
 .divider {
   height: 30px;
   background: var(--q-primary);
   margin: 60px 0 100px 0;
-  margin-left: calc(-50vw + 50%); /* da izađe iz container paddinga */
-  margin-right: calc(-50vw + 50%); /* da izađe iz container paddinga */
+  margin-left: calc(-50vw + 50%); /* da izađe iz  paddinga */
+  margin-right: calc(-50vw + 50%);
 }
 
+/* sekcija sa redovima partnera */
 .partners-section {
   display: flex;
   flex-direction: column;
   gap: 60px;
 }
 
-/* svaki red */
+/* jedan red partnera */
 .partner-row {
   display: flex;
   justify-content: center;
@@ -137,7 +146,7 @@ onMounted(loadPartners)
 }
 
 .partner-row:nth-child(2) {
-  justify-content: center; /* 2 partnera */
+  justify-content: center; /* 3 partnera */
 }
 
 /* svi ostali redovi (6 po redu) */
@@ -145,7 +154,7 @@ onMounted(loadPartners)
   flex-wrap: wrap;
 }
 
-/* kartica */
+/* slika logotipa partnera */
 .partner-card img {
   width: 140px;
   height: auto;

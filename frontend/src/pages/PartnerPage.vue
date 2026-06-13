@@ -1,7 +1,7 @@
 <template>
   <q-page v-if="partner">
 
-    <!-- HERO -->
+    <!-- dio sa slikom partnera -->
     <div class="hero-section">
       <img
         :src="getImage(partner.image_header)"
@@ -9,79 +9,69 @@
       />
     </div>
 
-    <!-- WRAPPER -->
+    <!-- sadržaj strancie -->
     <div class="partner-section">
 
-      <!-- TOP ROW -->
+      <!-- gornji red sa naslovom i karticom -->
       <div class="partner-top">
 
-        <!-- TITLE -->
+        <!-- naslkov partnera -->
         <div class="partner-title">
           <h1>{{ partner.name }}</h1>
           <h2>OFFICIAL PARTNER</h2>
         </div>
 
-        <!-- SOCIAL CARD -->
+        <!-- kartica sa društvenim mrežama -->
         <div class="partner-info">
-
           <div class="info-title">
             CONNECT WITH {{ partner.name }}
           </div>
 
+          <!-- web stranica se prikazuje ako postoji u bazi --> 
           <a
             v-if="partner.website"
             :href="partner.website"
             target="_blank"
-            class="info-row"
-          >
+            class="info-row">
             <i class="fas fa-globe"></i> Website
           </a>
 
+          <!-- instagram se prikazuje ako postoji u bazi --> 
           <a
             v-if="partner.instagram"
             :href="formatSocial('instagram', partner.instagram)"
             target="_blank"
-            class="info-row"
-          >
+            class="info-row">
             <i class="fab fa-instagram"></i> Instagram
           </a>
 
+          <!-- twitter se prikazuje ako postoji u bazi --> 
           <a
             v-if="partner.twitter"
             :href="formatSocial('twitter', partner.twitter)"
             target="_blank"
-            class="info-row"
-          >
+            class="info-row">
             <i class="fab fa-x-twitter"></i> Twitter
           </a>
 
+          <!-- facebook se prikazuje ako postoji u bazi --> 
           <a
             v-if="partner.facebook"
             :href="formatSocial('facebook', partner.facebook)"
             target="_blank"
-            class="info-row"
-          >
+            class="info-row">
             <i class="fab fa-facebook"></i> Facebook
           </a>
-
         </div>
-
       </div>
 
-      <!-- DESCRIPTION (SVE PARAGRAFE) -->
+      <!-- tekst partnera -->
       <div class="partner-description">
-
-        <p
-          v-for="(p, index) in descriptionParagraphs"
-          :key="index"
-        >
+        <p v-for="(p, index) in descriptionParagraphs" :key="index">
           {{ p }}
         </p>
-
       </div>
-
     </div>
-
   </q-page>
 </template>
 
@@ -90,25 +80,27 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
 
-const route = useRoute()
-const partner = ref(null)
+const route = useRoute() // dohvaćanje id partnera iz url
+const partner = ref(null) // sprema podatke o partneru
 
-const api_url = import.meta.env.VITE_API_URL
+const api_url = import.meta.env.VITE_API_URL //url backend apija u .env datoteci
 
+// funkcija prima putanju slike iz baze i varća potpuni je u url 
 const getImage = (path) => {
   if (!path) return ''
   return `${api_url}/${encodeURI(path)}`
 }
 
-/* 🔥 SPLITAJ TEKST IZ BAZE U VIŠE ODLOMAKA */
+/* dijeli opis u više odlomaka */
 const descriptionParagraphs = computed(() => {
   if (!partner.value?.description) return []
 
   return partner.value.description
-    .split('\n')   // 👈 svaki novi red = novi paragraf
+    .split('\n')   // svaki novi red je novi paragraf
     .filter(p => p.trim() !== '')
 })
 
+// funkcija formatira linkove društvenih mreža
 const formatSocial = (type, value) => {
   if (!value) return ''
   if (value.startsWith('http')) return value
@@ -120,6 +112,7 @@ const formatSocial = (type, value) => {
   return value
 }
 
+// funlcija dohvaća podatke o partneru prema id iz url
 const loadPartner = async () => {
   try {
     const res = await axios.get(
@@ -131,12 +124,11 @@ const loadPartner = async () => {
   }
 }
 
+// prikazuju se podatci o partneru
 onMounted(loadPartner)
 </script>
 
 <style scoped>
-
-/* HERO */
 .hero-section {
   width: 100%;
   margin-top: 70px;
@@ -147,12 +139,12 @@ onMounted(loadPartner)
   display: block;
 }
 
-/* WRAPPER */
+/* sadržaj stranice */
 .partner-section {
   padding: 60px 70px 120px 70px;
 }
 
-/* TOP ROW */
+/* gornji red sa naslovom i karticom */
 .partner-top {
   display: grid;
   grid-template-columns: 1fr 280px;
@@ -160,7 +152,7 @@ onMounted(loadPartner)
   column-gap: 60px;
 }
 
-/* TITLE */
+/* naslov */
 .partner-title h1 {
   margin: 0;
   color:black;
@@ -171,7 +163,7 @@ onMounted(loadPartner)
   margin-top: 10px;
 }
 
-/* CARD */
+/* kartica */
 .partner-info {
   width: 280px;
   background: var(--q-accent);
@@ -182,12 +174,14 @@ onMounted(loadPartner)
   gap: 12px;
 }
 
+/* naslov u karticis */
 .info-title {
   font-weight: 700;
   text-transform: uppercase;
   margin-bottom: 10px;
 }
 
+/* red u kartici */
 .info-row {
   text-decoration: none;
   color: black;
@@ -199,6 +193,7 @@ onMounted(loadPartner)
   line-height: 1.2;
 }
 
+/* ikona za društvenu mrežu */
 .info-row i {
   font-size: 18px;
 }
@@ -207,7 +202,7 @@ onMounted(loadPartner)
   color: var(--q-primary);
 }
 
-/* DESCRIPTION */
+/* dio sa tekstom */
 .partner-description {
   max-width: 750px;
   text-align: justify;

@@ -5,10 +5,12 @@
   />
 
   <q-page class="home-page">
+
+    <!-- dio sa slikom i tekstom na vrhu -->
     <div class="hero-section">
       <img src="src/assets/Header-Home.jpg" class="hero-image" />
 
-      <div class="hero-overlay"></div>
+      <div class="hero-overlay"></div> <!-- tamni overlay na sloci -->
 
       <div class="hero-text">
         <h1>TGR HAAS F1 TEAM</h1>
@@ -17,6 +19,7 @@
       </div>
     </div>
 
+    <!-- sekcija sa kratkim teksom o timu -->
     <div class="about-card">
       <h3>An American Formula 1 team driven by engineering excellence.</h3>
 
@@ -34,13 +37,14 @@
       </p>
     </div>
 
-    <!-- DRIVERS -->
+    <!-- sekcija sa vozačima tima -->
     <div class="drivers-section">
       <div class="drivers-header">
         <h4>GET TO KNOW</h4>
         <h3>OUR FORMULA 1 DRIVERS</h3>
       </div>
 
+      <!-- prikazuje dva člana tima koji imaju rolu driver u bazi podataka i vodi na stranicu o njima -->
       <div class="drivers-grid">
         <router-link
           v-for="driver in drivers"
@@ -50,6 +54,7 @@
         >
           <img :src="getImage(driver.image_profile)" class="driver-img" />
 
+          <!-- tekst na kratici vozača -->
           <div class="driver-text">
             <p>#{{ driver.driver_number }}</p>
             <p>{{ driver.name }} {{ driver.surname }}</p>
@@ -58,13 +63,14 @@
       </div>
     </div>
 
-    <!-- ARTICLES -->
+    <!-- sekcija najnovijih vijesti -->
     <div class="news-section">
       <div class="news-header">
         <h4>FIND OUT</h4>
         <h3>LATEST NEWS</h3>
       </div>
 
+      <!-- prikaz 3 najnovije vijesti, vodi na tu vijest -->
       <div class="news-grid">
         <router-link
           v-for="article in latestArticles"
@@ -74,6 +80,7 @@
         >
           <img :src="getImage(article.image_profile)" class="news-image" />
 
+          <!-- datum objave vijesti -->
           <div class="news-date">
             {{ new Date(article.published_at).toLocaleDateString('en-GB') }}
           </div>
@@ -91,17 +98,19 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 
-const drivers = ref([])
-const latestArticles = ref([])
+const drivers = ref([]) // sprema dva vozača koji se prikazuju
+const latestArticles = ref([]) // sprema 3 najnovije vijesti koje se prikazuju
 
-const api_url = import.meta.env.VITE_API_URL
+const api_url = import.meta.env.VITE_API_URL // ulr backend apija iz .env datoteke
 
+// funkcija prima putanju slike iz backenda i vraća potpuni url za sliku
 const getImage = (path) => {
   if (!path) return ''
 
   return `${api_url}/${encodeURI(path)}`
 }
 
+// funkcija dohvaća sve članove tima i filtrira ih an samo one koji imaju rolu driver
 const loadDrivers = async () => {
   try {
     const res = await axios.get(`${api_url}/haas-team`)
@@ -114,6 +123,7 @@ const loadDrivers = async () => {
   }
 }
 
+// funklcija dohvaća sve članke, sortiraju se od najnovijeg i prikazuju se prva 
 const loadLatestArticles = async () => {
   try {
     const res = await axios.get(`${api_url}/articles`)
@@ -126,13 +136,14 @@ const loadLatestArticles = async () => {
   }
 }
 
+// nakon učitavanja prikazuju se vozači i članci
 onMounted(() => {
   loadDrivers()
   loadLatestArticles()
 })
 </script>
 
-<style>
+<style scoped>
 /* stranica */
 .home-page {
   background: #ffffff;
@@ -150,6 +161,7 @@ onMounted(() => {
   width: 100%;
 }
 
+/* tamni prijelaz na slici */
 .hero-overlay {
   position: absolute;
   inset: 0;
@@ -169,14 +181,14 @@ onMounted(() => {
   bottom: 60px;
 }
 
-/* odlomak sa tekstom */
+/* dio sa tekstom */
 .about-card {
   padding: 150px 430px;
   justify-content: center;
   margin: 0 auto;
 }
 
-/* odlomak sa tekstom */
+/* tekst */
 .about-card p {
   max-width: 900px;
   text-align: justify;
@@ -187,6 +199,7 @@ onMounted(() => {
   margin-left: 55px;
 }
 
+/* grid sa karticama vozača, flex za raspred na dva dijela */
 .drivers-grid {
   display: flex;
   justify-content: center;
@@ -194,14 +207,7 @@ onMounted(() => {
   margin: 70px 200px;
 }
 
-.driver-card {
-  position: relative;
-  width: 50%;
-  max-width: 500px;
-
-  overflow: hidden; /* sakrije rubove kod zooma */
-}
-
+/* zasebna kartica vozača */
 .driver-card {
   position: relative;
   width: 50%;
@@ -209,18 +215,20 @@ onMounted(() => {
   overflow: hidden; /* sakrije rubove kod zooma */
 }
 
+/* slika vozača na kartici */
 .driver-img {
   width: 100%;
   height: auto;
   display: block;
-
   transition: transform 0.5s ease;
 }
 
+/* povećavanje slike unutar kartice */
 .driver-card:hover .driver-img {
   transform: scale(1.05);
 }
 
+/* tekst na kartici */
 .driver-text {
   position: absolute;
   top: 30px;
@@ -236,12 +244,13 @@ onMounted(() => {
   letter-spacing: 1px;
 }
 
+/* najnovije vijesti */
 .news-header {
   margin-left: 55px;
   margin-bottom: 60px;
 }
 
-/* ISTI GRID KAO ARTICLES */
+/* grid sa 3 vijesti, kao na stranici articles */
 .news-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -250,6 +259,7 @@ onMounted(() => {
   padding: 20px 70px 120px 70px;
 }
 
+/* kartica vijesti */
 .news-card {
   display: flex;
   flex-direction: column;
@@ -259,6 +269,7 @@ onMounted(() => {
   transition: transform 0.25s ease;
 }
 
+/* hover podiže karticu */
 .news-card:hover {
   transform: translateY(-5px);
 }
@@ -267,16 +278,16 @@ onMounted(() => {
   color: var(--q-primary);
 }
 
-/* SLIKA */
+/* slika vijesti */
 .news-image {
-  width: 100%;
-  height: auto;
-  object-fit: contain;
+  width: 400px;
+  height: 400px;
+  object-fit: cover;
   display: block;
   box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
 }
 
-/* DATUM */
+/* datum vijesti */
 .news-date {
   font-size: 13px;
   color: #777;
@@ -284,13 +295,12 @@ onMounted(() => {
   font-weight: 400;
 }
 
-/* NASLOV */
+/* naslov vijesti */
 .news-title {
   font-size: 18px;
   font-weight: 500;
   font-family: 'IBM Plex Sans', sans-serif;
   line-height: 1.4;
-
   /* da ne izlazi iz kartice */
   width: 100%;
   overflow-wrap: break-word;
