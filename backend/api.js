@@ -1,3 +1,4 @@
+require("dotenv").config(); //učitava varijable iz .env datoteke (za bazu, token i port)
 const express = require("express"); //framework za izradu backenda i api ruta
 const cors = require("cors"); //potrebanm za komunkaciju frontenda i backenda
 const path = require("path"); //rad sa putanjama i datotekama
@@ -9,7 +10,7 @@ const fs = require("fs"); //rad s daotetkama na serveru
 const cron = require("node-cron"); //automatkso pokretanje zadataka u određeno vrijeme
 const axios = require("axios"); //slanje HTTP zahtjeva prema vanjskim apijima
 
-const JWT_SECRET = "super_secret_key_change_this"; //ključ za popisivanje tokena
+const JWT_SECRET = process.env.JWT_SECRET; //ključ za popisivanje tokena
 const app = express(); //kreiranje express aplikacije
 
 app.use(cors()); //omogućuje cors, forntend ne bi mogao slati zahtejev bez ovoga
@@ -19,10 +20,10 @@ app.use("/uploads", express.static("uploads")); //posluživanje slika iz uploads
 
 // MySQL spajanje na bazu
 const db = mysql.createConnection({
-  host: "ucka.veleri.hr",
-  user: "pgrgic",
-  password: "11",
-  database: "pgrgic",
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
 });
 
 db.connect((err) => {
@@ -907,7 +908,7 @@ cron.schedule("0 3 * * *", async () => {
 });
 
 //port na kojem backend server radi
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 //pokretanje express servera
 app.listen(PORT, () => {
