@@ -1,10 +1,9 @@
 <template>
   <q-page v-if="race" class="race-page">
-    <!-- HERO -->
     <div class="hero-section">
       <img :src="getImage(race.image_header)" class="hero-image" />
 
-      <div class="hero-overlay"></div>
+      <div class="hero-overlay"></div> <!-- tamni prijelaz preko slike -->
 
       <div class="hero-text">
         <h1>{{ race.race_name }}</h1>
@@ -12,15 +11,15 @@
       </div>
     </div>
 
-    <!-- TRACK SECTION -->
+    <!-- sekcija sa stazom i informacijama -->
     <section class="track-section">
       <div class="track-header">
         <h4>{{ race.race_name }}</h4>
-        <h3>{{ race.name || race.circuit_name }}</h3>
+        <h3>{{ race.circuit_name }}</h3>
       </div>
 
       <div class="track-content">
-        <!-- MAP IMAGE -->
+        <!-- mapa starze, ako je upaljeno showSectors onda se prikazuje slika sa sektorima, ako nije onda obična -->
         <div class="track-map-wrap">
           <img
             :src="getImage(showSectors ? race.image_sectors : race.image_track)"
@@ -28,8 +27,9 @@
           />
         </div>
 
-        <!-- SESSIONS -->
+        <!-- kartica sa terminima svih sesija -->
         <div class="sessions-card">
+          <!-- gumb mijenja prikaz vremen po vremenskoj zoni staze i korisnikovoj vremenskoj zoni-->
           <div class="timezone-toggle">
             <button
               class="timezone-btn"
@@ -39,6 +39,8 @@
               {{ useMyTimezone ? 'SHOW LOCAL TIME' : 'SHOW MY TIME' }}
             </button>
           </div>
+
+          <!-- tablica svih sesija -->
           <table>
             <tbody>
               <tr v-for="session in sessions" :key="session.session_key">
@@ -51,16 +53,15 @@
         </div>
       </div>
 
-      <!-- INFO BAR -->
+      <!-- dio sa informacijama -->
       <div class="info-bar">
+        <!-- za prikaz sekcija na mapi staze -->
         <div class="sector-toggle">
           <span>SECTORS</span>
 
           <label class="custom-checkbox">
             <input type="checkbox" v-model="showSectors" />
-
             <span class="checkmark"></span>
-
             {{ showSectors ? 'ON' : 'OFF' }}
           </label>
         </div>
@@ -102,7 +103,7 @@
       </div>
     </section>
 
-    <!-- DESCRIPTION -->
+    <!-- opis staze -->
     <section class="description-section">
       <h4>EXPLORE THE TRACK</h4>
       <h3>EVERY CORNER TELLS A STORY</h3>
@@ -110,12 +111,13 @@
       <p>{{ race.description }}</p>
     </section>
 
+    <!-- dio sa dodatnim informacijam -->
     <section class="more-section">
       <h4>BEHIND THE TRACK</h4>
       <h3>GET TO KNOW MORE</h3>
 
       <div class="more-grid">
-        <!-- FUN FACT -->
+        <!-- fun fact dio -->
         <div class="accordion-item" :class="{ open: showFunFact }">
           <div class="accordion-header" @click="showFunFact = !showFunFact">
             <span>FUN FACT</span>
@@ -127,7 +129,7 @@
           </div>
         </div>
 
-        <!-- TRACK FEATURES -->
+        <!-- karakteristike staze -->
         <div class="accordion-item" :class="{ open: showTrackFeatures }">
           <div class="accordion-header" @click="showTrackFeatures = !showTrackFeatures">
             <span>TRACK FEATURES</span>
@@ -141,13 +143,13 @@
       </div>
     </section>
 
-    <!-- GALLERY -->
-
+    <!-- galerija -->
     <div class="gallery-section" v-if="circuitGallery.length">
       <h4 class="gallery-subtitle">MEMORIES FROM</h4>
 
       <h3 class="gallery-title">THE TRACK</h3>
 
+      <!-- strelice -->
       <div class="gallery-arrows">
         <div class="gallery-arrow" @click="prevGallery">
           <i class="fas fa-chevron-left"></i>
@@ -158,6 +160,7 @@
         </div>
       </div>
 
+      <!-- slider galerije -->
       <div class="gallery-wrapper">
         <div
           class="gallery-track"
@@ -165,7 +168,7 @@
             transform: `translateX(-${galleryIndex * 100}%)`,
           }"
         >
-          <div class="gallery-group" v-for="(group, gIndex) in groupedGallery" :key="gIndex">
+          <div class="gallery-group" v-for="(group, gIndex) in groupedGallery" :key="gIndex"> <!-- svaka grupa iam 2 slike -->
             <div class="gallery-item" v-for="img in group" :key="img.id_image">
               <img :src="getImage(img.image)" />
             </div>
@@ -181,24 +184,30 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
 
-const route = useRoute()
-const api_url = import.meta.env.VITE_API_URL
+const route = useRoute() //dohvaća id utrke iz url
+const api_url = import.meta.env.VITE_API_URL // url backend apija u .env datoteci
 
-const race = ref(null)
-const sessions = ref([])
-const showSectors = ref(false)
+const race = ref(null) // sprema osnovne podatek u satzi i utrci
+const sessions = ref([]) //sprema tremine sesija
+const showSectors = ref(false) // određuje prikazuje li se mapa ili sektori
 
-const showFunFact = ref(false)
-const showTrackFeatures = ref(false)
+// kontorlira je li accordion otvoren
+const showFunFact = ref(false) 
+const showTrackFeatures = ref(false) 
 
-const circuitGallery = ref([])
-const galleryIndex = ref(0)
+const circuitGallery = ref([]) // sprema galeriju slika 
+const galleryIndex = ref(0) // trenutni indeks galerije
 
+const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone // dohvaća vremensku zoni korisnika iz preglednika
+const useMyTimezone = ref(false) // određuje prikazuje li se vrijeme lokalno ili u korisnkovoj zoni
+
+// prima putanju slike iz baze i pretvara je u puni url
 const getImage = (path) => {
   if (!path) return ''
   return `${api_url}/${encodeURI(path)}`
 }
 
+// funkcija dohvaća detalje utrkle prema id iz url
 const loadRace = async () => {
   try {
     const res = await axios.get(`${api_url}/race-details/${route.params.id}`)
@@ -212,11 +221,13 @@ const loadRace = async () => {
   }
 }
 
+// funkcija dohvaća sve sesije za utrku
 const loadSessions = async () => {
   const res = await axios.get(`${api_url}/race-sessions/${route.params.id}`)
   sessions.value = res.data
 }
 
+// formatira datum, prkazuje samo kraće ime dana, dan i kreći mjesec
 const formatSessionDate = (date) => {
   if (!date) return ''
 
@@ -229,16 +240,32 @@ const formatSessionDate = (date) => {
     .toUpperCase()
 }
 
-const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+/*
+  Funkcija formatira vrijeme sesije.
 
-const useMyTimezone = ref(false)
+  Ima dva načina rada:
 
+  1. SHOW MY TIME:
+     Vrijeme se prikazuje u vremenskoj zoni korisnika.
+     Preglednik automatski prepoznaje korisnikovu vremensku zonu
+     pomoću Intl.DateTimeFormat().resolvedOptions().timeZone.
+
+  2. SHOW LOCAL TIME:
+     Vrijeme se prikazuje kao lokalno vrijeme države u kojoj se utrka vozi.
+     Za to se koristi gmt_offset iz baze, npr. "02:00:00" ili "-05:00:00".
+
+  Kod lokalnog vremena:
+  - uzima se početni UTC datum sesije
+  - iz gmt_offset vrijednosti se izračuna pomak u milisekundama
+  - taj pomak se doda na originalni datum
+  - zatim se vrijeme formatira kao UTC kako bi se prikazao već izračunati lokalni sat
+*/
 const formatSessionTime = (session) => {
   if (!session?.date_start) return ''
 
   const date = new Date(session.date_start)
 
-  // MY TIMEZONE
+  // korsnikova zona
   if (useMyTimezone.value) {
     return date.toLocaleTimeString('en-GB', {
       hour: '2-digit',
@@ -247,19 +274,25 @@ const formatSessionTime = (session) => {
     })
   }
 
-  // LOCAL RACE TIME
+  // lokalno vrijeme
   const offset = session.gmt_offset || '00:00:00'
 
+  // provjerava se je li pomak pozitvan ili negativan
   const sign = offset.startsWith('-') ? -1 : 1
 
+  // miče se minus
   const cleanOffset = offset.replace('-', '')
 
+  // Iz gmt_offset vrijednosti dohvaćaju se sati i minute
   const [hours, minutes] = cleanOffset.split(':').map(Number)
 
+   // Vremenski pomak pretvara se u milisekunde
   const offsetMs = sign * ((hours * 60 + minutes) * 60 * 1000)
 
+  // Na UTC vrijeme dodaje se pomak lokalne vremenske zone utrke
   const localRaceDate = new Date(date.getTime() + offsetMs)
 
+  // Vrijeme se formatira kao UTC jer je pomak već ručno uračunat
   return localRaceDate.toLocaleTimeString('en-GB', {
     hour: '2-digit',
     minute: '2-digit',
@@ -267,6 +300,7 @@ const formatSessionTime = (session) => {
   })
 }
 
+// funkcija dohvaća gerliju slika za id utrke iz urla
 const loadCircuitGallery = async () => {
   try {
     const res = await axios.get(`${api_url}/circuit-gallery/${race.value.id_circuit}`)
@@ -277,6 +311,7 @@ const loadCircuitGallery = async () => {
   }
 }
 
+// computed grupira slike galerije po dvije
 const groupedGallery = computed(() => {
   const groups = []
 
@@ -287,25 +322,27 @@ const groupedGallery = computed(() => {
   return groups
 })
 
+// pomiče galeriju naprijed
 const nextGallery = () => {
   if (galleryIndex.value < groupedGallery.value.length - 1) {
     galleryIndex.value++
   }
 }
 
+// pomiče galeriju nazad
 const prevGallery = () => {
   if (galleryIndex.value > 0) {
     galleryIndex.value--
   }
 }
 
+// nakon učitavanja prikazuje podatke utrke
 onMounted(() => {
   loadRace()
 })
 </script>
 
 <style scoped>
-/* HERO */
 .hero-section {
   position: relative;
   width: 100%;
@@ -336,7 +373,7 @@ onMounted(() => {
   text-transform: uppercase;
 }
 
-/* TRACK AREA */
+/* dio sa informacijama o stazi */
 .track-section {
   margin: 110px 0px;
   padding: 45px 45px 70px;
@@ -354,6 +391,7 @@ onMounted(() => {
   text-transform: uppercase;
 }
 
+/* grid raspored, staza i tablica sesija */
 .track-content {
   display: grid;
   grid-template-columns: 1fr 430px;
@@ -362,39 +400,45 @@ onMounted(() => {
   margin-top: 40px;
 }
 
+/* slika staze ili sektora */
 .track-map {
   width: auto;
   display: block;
 }
 
+/* kartica sa rasporedom sesija */
 .sessions-card {
   background: white;
   box-shadow: 0 4px 25px rgba(0, 0, 0, 0.15);
   padding: 20px;
 }
 
+/* tablica */
 .sessions-card table {
   width: 100%;
   border-collapse: collapse;
 }
 
+/* ćelije tablice */
 .sessions-card td {
   padding: 13px 8px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.12);
   font-size: 14px;
 }
 
+/* ime sesije */
 .sessions-card td:first-child {
   font-weight: 700;
 }
 
+/* datum i vrijeme */
 .sessions-card td:nth-child(2),
 .sessions-card td:nth-child(3) {
   text-align: right;
   white-space: nowrap;
 }
 
-/* INFO BAR */
+/* traka sa podatcima */
 .info-bar {
   margin: 60px auto 0;
   background: white;
@@ -405,6 +449,7 @@ onMounted(() => {
   gap: 20px;
 }
 
+/* naslov podatka */
 .info-bar span {
   display: block;
   font-size: 14px;
@@ -413,11 +458,13 @@ onMounted(() => {
   margin-bottom: 4px;
 }
 
+/* vrijednost */
 .info-bar strong {
   font-size: 14px;
   color: black;
 }
 
+/* dio sa checboxom */
 .sector-toggle label {
   font-size: 14px;
 }
@@ -444,7 +491,7 @@ onMounted(() => {
   background: var(--q-primary);
 }
 
-/* DESCRIPTION */
+/* opis staze */
 .description-section {
   max-width: 650px;
   margin: 0 auto 120px;
@@ -464,6 +511,7 @@ onMounted(() => {
   line-height: 1.8;
 }
 
+/* accordion sekcije */
 .more-section {
   padding: 0 70px 130px;
 }
@@ -478,6 +526,7 @@ onMounted(() => {
   margin-bottom: 60px;
 }
 
+/* dva accordiona jedna pored drugog */
 .more-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -485,6 +534,7 @@ onMounted(() => {
   align-items: start;
 }
 
+/* accordion kartici */
 .accordion-item {
   width: 100%;
   background: var(--q-primary);
@@ -496,17 +546,15 @@ onMounted(() => {
   box-shadow: 0 4px 25px rgba(0, 0, 0, 0.15);
 }
 
+/* zaglavlje */
 .accordion-header {
   height: 70px;
   padding: 0 30px;
-
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   cursor: pointer;
   font-weight: 700;
-
   background: var(--q-primary);
   color: white;
   box-shadow: 0 4px 25px rgba(0, 0, 0, 0.15);
@@ -517,14 +565,13 @@ onMounted(() => {
   box-shadow: none;
 }
 
+/* sadržaj */
 .accordion-body {
   background: var(--q-primary);
   color: white;
-
   padding: 30px;
   line-height: 1.8;
   text-align: justify;
-
   border-top: 1px solid rgba(255, 255, 255, 0.15);
 }
 
@@ -533,11 +580,13 @@ onMounted(() => {
   color: white;
 }
 
+/* plus/minus ikona */
 .accordion-header span:last-child {
   font-size: 24px;
   font-weight: 300;
 }
 
+/* galerija */
 .gallery-section {
   padding: 80px 70px 120px;
 }
@@ -546,6 +595,7 @@ onMounted(() => {
   margin-top: 10px;
 }
 
+/* strlice */
 .gallery-arrows {
   display: flex;
   justify-content: flex-end;
@@ -553,16 +603,15 @@ onMounted(() => {
   margin: 20px 0 40px;
 }
 
+/* strelica */
 .gallery-arrow {
   width: 55px;
   height: 32px;
   background: var(--q-primary);
   border: 1px solid var(--q-primary);
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   cursor: pointer;
   transition: 0.25s ease;
 }
@@ -571,6 +620,7 @@ onMounted(() => {
   background: transparent;
 }
 
+/* ikona strelice */
 .gallery-arrow i {
   color: white;
   transition: 0.25s ease;
@@ -580,6 +630,7 @@ onMounted(() => {
   color: var(--q-primary);
 }
 
+/* sakriva sadržaj izvan slidera */
 .gallery-wrapper {
   overflow: hidden;
 }
@@ -589,12 +640,14 @@ onMounted(() => {
   transition: transform 0.5s ease;
 }
 
+/* jedna grupa */
 .gallery-group {
   display: flex;
   gap: 40px;
   min-width: 100%;
 }
 
+/* jedna slika */
 .gallery-item {
   width: calc((100% - 40px) / 2);
 }
@@ -606,12 +659,14 @@ onMounted(() => {
   box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
 }
 
+/* vremenska zona */
 .timezone-toggle {
   display: flex;
   justify-content: flex-end;
   margin-bottom: 15px;
 }
 
+/* gumb za vremensku zonu */
 .timezone-btn {
   background: var(--q-primary);
   color: white;

@@ -6,9 +6,9 @@
       <h2>OFFICIAL TEAM MEMBERS</h2>
     </div>
 
-    <div class="divider"></div>
+    <div class="divider"></div> <!-- crta koja razdvaja sekcije -->
 
-    <!-- DRIVERS -->
+    <!-- sekcija vozača -->
     <section v-if="drivers.length" class="team-section">
       <div class="team-header">
         <div>
@@ -24,6 +24,7 @@
         </div>
       </div>
 
+      <!-- dio sa karticama vozača, vodi na njihovu stranicu -->
       <div class="team-grid">
         <router-link
           v-for="member in drivers"
@@ -38,7 +39,7 @@
       </div>
     </section>
 
-    <!-- LEADERSHIP -->
+    <!-- sekcija leadership -->
     <section v-if="leadership.length" class="team-section">
       <div class="team-header">
         <div>
@@ -53,6 +54,7 @@
         </div>
       </div>
 
+      <!-- dio s akarticama leadera, vodi na njihovu stranicu -->
       <div class="team-grid">
         <router-link
           v-for="member in leadership"
@@ -67,7 +69,7 @@
       </div>
     </section>
 
-    <!-- RESERVE -->
+    <!-- sekcija reserve vozača -->
     <section v-if="reserveDrivers.length" class="team-section">
       <div class="team-header">
         <div>
@@ -83,6 +85,7 @@
         </div>
       </div>
 
+      <!-- dio s akarticama rezevrnih vozača, vosi na njihovu karticu -->
       <div class="team-grid">
         <router-link
           v-for="member in reserveDrivers"
@@ -97,7 +100,7 @@
       </div>
     </section>
 
-    <!-- ACADEMY -->
+    <!-- sekcija academy vozača -->
     <section v-if="academyDrivers.length" class="team-section">
       <div class="team-header">
         <div>
@@ -113,6 +116,7 @@
         </div>
       </div>
 
+      <!-- dio sa karticom academy vozača, vodi na njihovu stranicu -->
       <div class="team-grid">
         <router-link
           v-for="member in academyDrivers"
@@ -133,20 +137,23 @@
 import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
 
-const api_url = import.meta.env.VITE_API_URL
+const api_url = import.meta.env.VITE_API_URL // url backand apija u .env datoteci
 
-const members = ref([])
+const members = ref([]) // sprema sve članove tima
 
+// prima putanju slike i pretvara je u puni url
 const getImage = (path) => {
   if (!path) return ''
   return `${api_url}/${encodeURI(path)}`
 }
 
+// funkcija dohvaća sve članove tima
 const loadMembers = async () => {
   const res = await axios.get(`${api_url}/haas-team`)
   members.value = res.data
 }
 
+// computed filtrira članove tima u driver, leadership, reserve_driver i academy_dirvers
 const drivers = computed(() => members.value.filter((m) => m.role === 'driver'))
 
 const leadership = computed(() => members.value.filter((m) => m.role === 'leadership'))
@@ -155,6 +162,7 @@ const reserveDrivers = computed(() => members.value.filter((m) => m.role === 're
 
 const academyDrivers = computed(() => members.value.filter((m) => m.role === 'academy_driver'))
 
+// nakon učitavanja prikazuju se svi članovi
 onMounted(loadMembers)
 </script>
 
@@ -172,24 +180,23 @@ onMounted(loadMembers)
   margin: 0;
 }
 
+/* crta */
+.divider {
+  height: 30px;
+  background: var(--q-primary);
+  margin: 80px 0 0 0;
+  margin-left: calc(-50vw + 50%);  /* da izađe iz paddinga */
+  margin-right: calc(-50vw + 50%); 
+}
+
+
+/* sekcija sa tekstom lijevo i karicama desno */
 .team-section {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 100px;
   padding-top: 180px;
-}
-
-.team-info {
-  width: 35%;
-}
-
-.divider {
-  height: 30px;
-  background: var(--q-primary);
-  margin: 80px 0 0 0;
-  margin-left: calc(-50vw + 50%); /* da izađe iz container paddinga */
-  margin-right: calc(-50vw + 50%); /* da izađe iz container paddinga */
 }
 
 .team-header {
@@ -200,26 +207,25 @@ onMounted(loadMembers)
   max-width: 600px;
 }
 
+/* grid dijela sa karticama */
 .team-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 80px;
 }
 
+/* kartica */
 .team-card {
   width: auto;
   text-decoration: none;
 }
 
+/* slika u kartici */
 .team-card img {
   display: block;
-
-  /* ORIGINALNA VELIČINA */
   width: auto;
   height: auto;
-
   box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
-
   transition: transform 0.3s ease;
 }
 

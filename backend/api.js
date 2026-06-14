@@ -1,28 +1,42 @@
-const express = require("express");
-const cors = require("cors");
-const path = require("path");
-const mysql = require("mysql2");
-const bcrypt = require("bcrypt");
-const multer = require("multer");
-const jwt = require("jsonwebtoken");
-const fs = require("fs");
-const cron = require("node-cron");
-const axios = require("axios");
+const express = require("express"); //framework za izradu backenda i api ruta
+const cors = require("cors"); //potrebanm za komunkaciju frontenda i backenda
+const path = require("path"); //rad sa putanjama i datotekama
+const mysql = require("mysql2"); //povezaivanje sa bazom podataka
+const bcrypt = require("bcrypt"); //sigurna provjera lozinki
+const multer = require("multer"); //za upload datoteke (slike)
+const jwt = require("jsonwebtoken"); //izrada i provjera tokena
+const fs = require("fs"); //rad s daotetkama na serveru
+const cron = require("node-cron"); //automatkso pokretanje zadataka u određeno vrijeme
+const axios = require("axios"); //slanje HTTP zahtjeva prema vanjskim apijima
 
-const JWT_SECRET = "super_secret_key_change_this";
-const UPLOAD_DIR = path.join(__dirname, "uploads");
-const app = express();
+const JWT_SECRET = "super_secret_key_change_this"; //ključ za popisivanje tokena
+const app = express(); //kreiranje express aplikacije
 
-app.use(cors());
-app.use(express.json());
+app.use(cors()); //omogućuje cors, forntend ne bi mogao slati zahtejev bez ovoga
+app.use(express.json()); //omogućuje čitanje JSON podataka
 
-app.use("/uploads", express.static("uploads"));
+app.use("/uploads", express.static("uploads")); //posluživanje slika iz uploads foldera
 
-const getImage = (path) => {
-  if (!path) return "";
-  return `${api_url}${path}`;
-};
+// MySQL spajanje na bazu
+const db = mysql.createConnection({
+  host: "ucka.veleri.hr",
+  user: "pgrgic",
+  password: "11",
+  database: "pgrgic",
+});
 
+db.connect((err) => {
+  if (err) {
+    console.log("Greška prilikom spajanja:", err);
+  } else {
+    console.log("Uspješno spajanje na bazu");
+  }
+});
+
+
+//funkcija za brisanje datoteke iz uploads foldera
+//prima putanju datoteke premljenu u bazu, pretvara putanju u potpunu i onda je fs.unlink pokušava obrisati
+//više pokušaja ako je EPERM greška, može se pojaviti na windowsu
 const deleteFile = (filePath) => {
   if (!filePath) return;
 
@@ -43,22 +57,10 @@ const deleteFile = (filePath) => {
   tryDelete();
 };
 
-// MySQL spajanje
-const db = mysql.createConnection({
-  host: "ucka.veleri.hr",
-  user: "pgrgic",
-  password: "11",
-  database: "pgrgic",
-});
 
-db.connect((err) => {
-  if (err) {
-    console.log("Greška prilikom spajanja:", err);
-  } else {
-    console.log("Uspješno spajanje na bazu");
-  }
-});
-
+//provjera administracijskog tokena
+//na rutama koje može korisiti samo admin
+//ako je tonek ispravan, podatci se spremaju u req.admin, a ako nije onda se javlja greška
 const verifyAdmin = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
@@ -77,6 +79,10 @@ const verifyAdmin = (req, res, next) => {
   }
 };
 
+
+//funkcija dohvaća najnoviji poredak vozača iz OpenF1 apija
+//za svakog vozača ažuriraju se points i position
+//u bazi se vozač pronalazi pomoću driver_number
 async function updateDriverStandings() {
   try {
     const response = await axios.get(
@@ -87,13 +93,10 @@ async function updateDriverStandings() {
 
     for (const driver of drivers) {
       db.query(
-        `
-        UPDATE Drivers
-        SET
+        `UPDATE Drivers SET
           points = ?,
           position = ?
-        WHERE driver_number = ?
-      `,
+        WHERE driver_number = ?`,
         [driver.points_current, driver.position_current, driver.driver_number],
       );
     }
@@ -104,6 +107,10 @@ async function updateDriverStandings() {
   }
 }
 
+
+//funkcija dohvaća najnoviji poredak timova iz OpenF1 apija
+//ažuriraju se points i position
+//tim se pronalazi prema team_name
 async function updateTeamStandings() {
   try {
     const response = await axios.get(
@@ -114,13 +121,10 @@ async function updateTeamStandings() {
 
     for (const team of teams) {
       db.query(
-        `
-        UPDATE Teams
-        SET
+        `UPDATE Teams SET
           points = ?,
           position = ?
-        WHERE team_name = ?
-      `,
+        WHERE team_name = ?`,
         [team.points_current, team.position_current, team.team_name],
       );
     }
@@ -131,6 +135,10 @@ async function updateTeamStandings() {
   }
 }
 
+
+//funkcija dohvača datume utrka za sezonu 2026 iz OpenF1 apija
+//vraća datume u ISO formatu, pretvaramo ih u samo datum
+//utrka se pronalazi prema openf1_meeting_key
 async function updateRaceDates() {
   try {
     const response = await axios.get(
@@ -147,13 +155,10 @@ async function updateRaceDates() {
       const dateEnd = meeting.date_end ? meeting.date_end.split("T")[0] : null;
 
       db.query(
-        `
-        UPDATE Race
-        SET
+        `UPDATE Race SET
           date_start = ?,
           date_end = ?
-        WHERE openf1_meeting_key = ?
-      `,
+        WHERE openf1_meeting_key = ?`,
         [dateStart, dateEnd, meeting.meeting_key],
       );
     }
@@ -164,18 +169,18 @@ async function updateRaceDates() {
   }
 }
 
+
 // GET ADMIN
+//dohvaća popis admina iz tablice Admin
 app.get("/admin", (req, res) => {
   db.query(
-    `
-    SELECT 
+    `SELECT 
       id_admin,
       name,
       surname,
       email,
       username
-    FROM Admin
-  `,
+    FROM Admin`,
     (err, result) => {
       if (err) return res.status(500).json(err);
       res.json(result);
@@ -183,12 +188,15 @@ app.get("/admin", (req, res) => {
   );
 });
 
+
+// POST ADMIN
+//za prijavu administratora
+//frontend šalje username i password, backend provjerava podatke, bcrypt uspoređuje lozinke i ako odgovaraju, frontendu se vraća token i podatci
 app.post("/admin/login", (req, res) => {
   const { username, password } = req.body;
 
   db.query(
-    `
-    SELECT
+    `SELECT
       id_admin,
       name,
       surname,
@@ -196,8 +204,7 @@ app.post("/admin/login", (req, res) => {
       username,
       password
     FROM Admin
-    WHERE username = ?
-  `,
+    WHERE username = ?`,
     [username],
     async (err, result) => {
       if (err) {
@@ -226,7 +233,7 @@ app.post("/admin/login", (req, res) => {
           });
         }
 
-        // 🔥 TOKEN
+        //izrada tokena
         const token = jwt.sign(
           {
             id_admin: admin.id_admin,
@@ -238,7 +245,7 @@ app.post("/admin/login", (req, res) => {
 
         res.json({
           success: true,
-          token, // 👈 OVO JE BITNO
+          token,
           admin: {
             id_admin: admin.id_admin,
             name: admin.name,
@@ -258,11 +265,13 @@ app.post("/admin/login", (req, res) => {
   );
 });
 
+
 // GET HAAS TEAM
+//dohvaća sve članove iz tablice Haas_team
+//na Team Page i Index Page
 app.get("/haas-team", (req, res) => {
   db.query(
-    `
-    SELECT 
+    `SELECT 
       id_member,
       name,
       surname,
@@ -273,8 +282,7 @@ app.get("/haas-team", (req, res) => {
       description,
       image_header,
       image_profile
-    FROM Haas_team
-  `,
+    FROM Haas_team`,
     (err, result) => {
       if (err) return res.status(500).json(err);
       res.json(result);
@@ -282,11 +290,13 @@ app.get("/haas-team", (req, res) => {
   );
 });
 
+
 // GET HAAS TEAM ID
+//dohvaća jednog člana tima prema id_member
+//na Team Member Page
 app.get("/haas-team/:id", (req, res) => {
   db.query(
-    `
-    SELECT 
+    `SELECT 
       id_member,
       name,
       surname,
@@ -298,8 +308,7 @@ app.get("/haas-team/:id", (req, res) => {
       image_header,
       image_profile
     FROM Haas_team
-    WHERE id_member = ?
-  `,
+    WHERE id_member = ?`,
     [req.params.id],
     (err, result) => {
       if (err) return res.status(500).json(err);
@@ -308,21 +317,22 @@ app.get("/haas-team/:id", (req, res) => {
   );
 });
 
-// CAREER HISTORY BY MEMBER ID
+
+// CAREER HISTORY MEMBER ID
+//dohvaća povijest određenog člana tima, id dolazi iz url
+//od najnovije godine prema najstarijoj
 app.get("/career-history/:id", (req, res) => {
   const memberId = req.params.id;
 
   db.query(
-    `
-    SELECT 
+    `SELECT 
       id_career AS id,
       id_member,
       year,
       content AS description
     FROM Career_history
     WHERE id_member = ?
-    ORDER BY year DESC
-    `,
+    ORDER BY year DESC`,
     [memberId],
     (err, result) => {
       if (err) {
@@ -335,11 +345,13 @@ app.get("/career-history/:id", (req, res) => {
   );
 });
 
-// GET SCHEDULE WITH CIRCUIT IMAGES
+
+// GET SCHEDULE 
+//dohvaća sve utrke za 2026
+//podatci iz tablice Race, a slike i lokacija iz tablice Circuits
 app.get("/schedule-races", (req, res) => {
   db.query(
-    `
-    SELECT 
+    `SELECT 
       r.id_race,
       r.id_circuit,
       r.race_name,
@@ -356,8 +368,7 @@ app.get("/schedule-races", (req, res) => {
     JOIN Circuits c
       ON r.id_circuit = c.id_circuit
     WHERE r.season_year = 2026
-    ORDER BY r.round ASC
-  `,
+    ORDER BY r.round ASC`,
     (err, result) => {
       if (err) return res.status(500).json(err);
       res.json(result);
@@ -365,11 +376,13 @@ app.get("/schedule-races", (req, res) => {
   );
 });
 
-// GET RACE DETAILS WITH CIRCUIT DATA
+
+// GET RACE DETAILS
+//detalji jedne utrke
+//spaja tablice Race i Circuit
 app.get("/race-details/:id", (req, res) => {
   db.query(
-    `
-    SELECT 
+    `SELECT 
       r.id_race,
       r.id_circuit,
       r.race_name,
@@ -378,7 +391,6 @@ app.get("/race-details/:id", (req, res) => {
       r.openf1_meeting_key,
       r.date_start,
       r.date_end,
-
       c.name AS circuit_name,
       c.city,
       c.country,
@@ -394,12 +406,10 @@ app.get("/race-details/:id", (req, res) => {
       c.image_profile,
       c.image_track,
       c.image_sectors
-
     FROM Race r
     JOIN Circuits c
       ON r.id_circuit = c.id_circuit
-    WHERE r.id_race = ?
-  `,
+    WHERE r.id_race = ?`,
     [req.params.id],
     (err, result) => {
       if (err) return res.status(500).json(err);
@@ -416,14 +426,16 @@ app.get("/race-details/:id", (req, res) => {
   );
 });
 
-// GET RACE SESSIONS FROM OPENF1
+
+// GET RACE SESSIONS
+//dohvaća sesije iz OpenF1 apija
+//iz baze se prema id_race dohvaća openf1_meeting_key koji se koristi u nedpointu
+//sortiraju se prema vremenu početka
 app.get("/race-sessions/:id", (req, res) => {
   db.query(
-    `
-    SELECT openf1_meeting_key
+    `SELECT openf1_meeting_key
     FROM Race
-    WHERE id_race = ?
-  `,
+    WHERE id_race = ?`,
     [req.params.id],
     async (err, result) => {
       if (err) return res.status(500).json(err);
@@ -437,7 +449,6 @@ app.get("/race-sessions/:id", (req, res) => {
 
       try {
         const meetingKey = result[0].openf1_meeting_key;
-
         const response = await axios.get(
           `https://api.openf1.org/v1/sessions?meeting_key=${meetingKey}`,
         );
@@ -459,11 +470,12 @@ app.get("/race-sessions/:id", (req, res) => {
   );
 });
 
+
 // GET ARTICLES
+//dohvaća sve članke iz teblice Articles
 app.get("/articles", (req, res) => {
   db.query(
-    `
-    SELECT 
+    `SELECT 
       id_article,
       short_title,
       long_title,
@@ -472,8 +484,7 @@ app.get("/articles", (req, res) => {
       image_header,
       published_at,
       id_admin
-    FROM Articles
-  `,
+    FROM Articles`,
     (err, result) => {
       if (err) return res.status(500).json(err);
       res.json(result);
@@ -481,9 +492,9 @@ app.get("/articles", (req, res) => {
   );
 });
 
-// =========================
-// MULTER CONFIG (kao ostali API-i)
-// =========================
+
+//multer za upload slike članka
+//diskStorage određuje gdje se sprema datoteka i kako će se zvati
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     if (file.fieldname === "image_profile") {
@@ -495,13 +506,15 @@ const storage = multer.diskStorage({
     }
   },
 
+  //naziv se generiraj pomoću Date.new da ne postoje dvije slike sa istim nazivom
   filename: (req, file, cb) => {
     cb(null, Date.now() + path.extname(file.originalname));
   },
 });
 
+//provjerava je li uploadana datoteka slika, ako nije image odbija se
 const fileFilter = (req, file, cb) => {
-  // dopuštamo samo slike
+  //samo slike
   if (file.mimetype.startsWith("image/")) {
     cb(null, true);
   } else {
@@ -509,17 +522,19 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
+//kreira multer instance, korisi se u post i put rutama
 const upload = multer({
   storage,
   fileFilter,
 });
 
-// =========================
-// CREATE ARTICLE
-// =========================
+
+// POST ARTICLES
+//kreira novi članak, samo za admina
+//moguće dvije slike dodati
 app.post(
   "/articles",
-  verifyAdmin, // 🔥 DODANO
+  verifyAdmin, 
   upload.fields([
     { name: "image_profile", maxCount: 1 },
     { name: "image_header", maxCount: 1 },
@@ -544,11 +559,10 @@ app.post(
 
     const date = published_at || new Date().toISOString().split("T")[0];
 
-    const id_admin = req.admin.id_admin; // 🔥 IZ TOKENA
+    const id_admin = req.admin.id_admin; 
 
     db.query(
-      `
-      INSERT INTO Articles (
+      `INSERT INTO Articles (
         short_title,
         long_title,
         text,
@@ -557,8 +571,7 @@ app.post(
         published_at,
         id_admin
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `,
+      VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [
         short_title,
         long_title,
@@ -586,30 +599,11 @@ app.post(
   },
 );
 
-// GET PARTNERS ID
-app.get("/articles/:id", (req, res) => {
-  db.query(
-    `
-   SELECT 
-      id_article,
-      short_title,
-      long_title,
-      text,
-      image_profile,
-      image_header,
-      published_at,
-      id_admin
-    FROM Articles
-    WHERE id_article = ?
-  `,
-    [req.params.id],
-    (err, result) => {
-      if (err) return res.status(500).json(err);
-      res.json(result[0]);
-    },
-  );
-});
 
+// PUT ARTICLES
+//uređuje postojeće vijesti
+//samo za admina
+//ako se odaberu nove slike, stare se brišu, nova ptanja ide u bazu
 app.put(
   "/articles/:id",
   verifyAdmin,
@@ -620,7 +614,7 @@ app.put(
   (req, res) => {
     const articleId = req.params.id;
 
-    // Datum objave se ne dohvaća jer se ne mijenja prilikom uređivanja članka
+    //datum objave se ne dohvaća jer se ne mijenja prilikom uređivanja članka
     const { short_title, long_title, text } = req.body;
 
     if (!short_title || !long_title || !text) {
@@ -630,7 +624,7 @@ app.put(
       });
     }
 
-    // Putanje novih slika, ako su nove slike odabrane u formi
+    //putanje novih slika, ako su nove slike odabrane u formi
     const newProfile = req.files?.image_profile?.[0]
       ? `uploads/Article/Profile/${req.files.image_profile[0].filename}`
       : null;
@@ -639,7 +633,7 @@ app.put(
       ? `uploads/Article/Header/${req.files.image_header[0].filename}`
       : null;
 
-    // Dohvaćaju se stare slike kako bi se mogle zadržati ili obrisati ako su zamijenjene
+    //dohvaćaju se stare slike kako bi se mogle zadržati ili obrisati ako su zamijenjene
     db.query(
       `SELECT image_profile, image_header FROM Articles WHERE id_article = ?`,
       [articleId],
@@ -660,32 +654,30 @@ app.put(
 
         const old = result[0];
 
-        // Ako je učitana nova profile slika, stara se briše iz uploads foldera
+        //ako je učitana nova profile slika, stara se briše iz uploads foldera
         if (newProfile && old.image_profile) {
           deleteFile(old.image_profile);
         }
 
-        // Ako je učitana nova header slika, stara se briše iz uploads foldera
+        //ako je učitana nova header slika, stara se briše iz uploads foldera
         if (newHeader && old.image_header) {
           deleteFile(old.image_header);
         }
 
-        // Ako nova slika nije učitana, zadržava se postojeća putanja stare slike
+        //ako nova slika nije učitana, zadržava se postojeća putanja stare slike
         const finalProfile = newProfile || old.image_profile;
         const finalHeader = newHeader || old.image_header;
 
-        // Ažuriraju se samo podaci koji se smiju mijenjati
+        //ažuriraju se samo podaci koji se smiju mijenjati
         db.query(
-          `
-          UPDATE Articles
+          `UPDATE Articles
           SET
             short_title = ?,
             long_title = ?,
             text = ?,
             image_profile = ?,
             image_header = ?
-          WHERE id_article = ?
-          `,
+          WHERE id_article = ?`,
           [
             short_title,
             long_title,
@@ -714,7 +706,34 @@ app.put(
   },
 );
 
+
+// GET ARTICLES ID
+//dohvaća jedan članak prema id_article
+app.get("/articles/:id", (req, res) => {
+  db.query(
+    `SELECT 
+      id_article,
+      short_title,
+      long_title,
+      text,
+      image_profile,
+      image_header,
+      published_at,
+      id_admin
+    FROM Articles
+    WHERE id_article = ?`,
+    [req.params.id],
+    (err, result) => {
+      if (err) return res.status(500).json(err);
+      res.json(result[0]);
+    },
+  );
+});
+
+
 // DELETE ARTICLES
+//briše vijest i njegove slike
+//samo za admina
 app.delete("/articles/:id", (req, res) => {
   const id = req.params.id;
 
@@ -730,11 +749,9 @@ app.delete("/articles/:id", (req, res) => {
 
       const article = result[0];
 
-      // 🔥 DELETE FILES
       deleteFile(article.image_profile);
       deleteFile(article.image_header);
 
-      // 🔥 DELETE DB
       db.query(`DELETE FROM Articles WHERE id_article = ?`, [id], (err2) => {
         if (err2) return res.status(500).json(err2);
 
@@ -747,11 +764,12 @@ app.delete("/articles/:id", (req, res) => {
   );
 });
 
+
 // GET PARTNERS
+//dohvaća sve partnere iz teblice Partners
 app.get("/partners", (req, res) => {
   db.query(
-    `
-    SELECT 
+    `SELECT 
       id_partner,
       name,
       description,
@@ -761,8 +779,7 @@ app.get("/partners", (req, res) => {
       facebook,
       logo,
       image_header
-    FROM Partners
-  `,
+    FROM Partners`,
     (err, result) => {
       if (err) return res.status(500).json(err);
       res.json(result);
@@ -770,11 +787,12 @@ app.get("/partners", (req, res) => {
   );
 });
 
+
 // GET PARTNERS ID
+//dohvaća jednog partnera prema id_partner
 app.get("/partners/:id", (req, res) => {
   db.query(
-    `
-   SELECT 
+    `SELECT 
       id_partner,
       name,
       description,
@@ -785,8 +803,7 @@ app.get("/partners/:id", (req, res) => {
       logo,
       image_header
     FROM Partners
-    WHERE id_partner = ?
-  `,
+    WHERE id_partner = ?`,
     [req.params.id],
     (err, result) => {
       if (err) return res.status(500).json(err);
@@ -795,18 +812,18 @@ app.get("/partners/:id", (req, res) => {
   );
 });
 
+
 // GET TEAM GALLERY ID
+//dohvaća galeriju slika za određenog člana tima prema id iz url
 app.get("/team-gallery/:id", (req, res) => {
   db.query(
-    `
-    SELECT 
+    `SELECT 
       id_image,
       id_member,
       image,
       description
     FROM Team_gallery
-    WHERE id_member = ?
-  `,
+    WHERE id_member = ?`,
     [req.params.id],
     (err, result) => {
       if (err) return res.status(500).json(err);
@@ -815,18 +832,18 @@ app.get("/team-gallery/:id", (req, res) => {
   );
 });
 
+
 // GET CIRCUIT GALLERY ID
+//dohvaća galeriju slika za određenu satzu prema id iz url
 app.get("/circuit-gallery/:id", (req, res) => {
   db.query(
-    `
-    SELECT 
+    `SELECT 
       id_image,
       id_circuit,
       image,
       description
     FROM Circuit_gallery
-    WHERE id_circuit = ?
-  `,
+    WHERE id_circuit = ?`,
     [req.params.id],
     (err, result) => {
       if (err) return res.status(500).json(err);
@@ -835,11 +852,12 @@ app.get("/circuit-gallery/:id", (req, res) => {
   );
 });
 
+
 // GET DRIVERS STANDINGS
+//dohvaća poredak vozača iz baze koji su ažurirani iz OpenF1
 app.get("/driver-standings", (req, res) => {
   db.query(
-    `
-    SELECT
+    `SELECT
       id_driver,
       name,
       surname,
@@ -848,8 +866,7 @@ app.get("/driver-standings", (req, res) => {
       points,
       position
     FROM Drivers
-    ORDER BY position ASC
-  `,
+    ORDER BY position ASC`,
     (err, result) => {
       if (err) return res.status(500).json(err);
       res.json(result);
@@ -857,18 +874,18 @@ app.get("/driver-standings", (req, res) => {
   );
 });
 
+
 // GET TEAMS STANDINGS
+//dohvaća poredak timova iz baze, sortiraju se prema poziciji
 app.get("/team-standings", (req, res) => {
   db.query(
-    `
-    SELECT
+    `SELECT
       id_team,
       team_name,
       points,
       position
     FROM Teams
-    ORDER BY position ASC
-  `,
+    ORDER BY position ASC`,
     (err, result) => {
       if (err) return res.status(500).json(err);
       res.json(result);
@@ -876,6 +893,9 @@ app.get("/team-standings", (req, res) => {
   );
 });
 
+
+//corn se pokreće svaki dan u 3:00
+//ažurira poredak vozača, poredak timova i datume utrka
 cron.schedule("0 3 * * *", async () => {
   console.log("Daily standings update started");
 
@@ -886,8 +906,10 @@ cron.schedule("0 3 * * *", async () => {
   console.log("Daily standings update finished");
 });
 
+//port na kojem backend server radi
 const PORT = 3000;
 
+//pokretanje express servera
 app.listen(PORT, () => {
   console.log(`Server radi na portu ${PORT}`);
 });

@@ -1,27 +1,32 @@
 <template>
   <q-page v-if="member">
     <div class="hero-section">
-      <img :src="getImage(member.image_header)" class="hero-image" />
+      <img :src="getImage(member.image_header)" class="hero-image" /> <!-- slika tog člana -->
 
-      <div class="hero-overlay"></div>
+      <div class="hero-overlay"></div> <!-- tamni prijelaz preko slike -->
+
+      <!-- ime i prezime člana -->
       <div class="hero-text">
         <h1>{{ member.name.toUpperCase() }} {{ member.surname.toUpperCase() }}</h1>
 
         <h2>OFFICIAL TEAM MEMBER</h2>
       </div>
     </div>
+    <!-- skekcija sa tekstom o članu tima, 2 odlomka -->
     <div class="member-content">
       <div class="member-description">
         <p v-for="(paragraph, index) in firstParagraphs" :key="'first-' + index">
           {{ paragraph }}
         </p>
 
+        <!-- dio gdje se prikazuje ostatak teksta kada se stisne gumb -->
         <template v-if="showFullText">
           <p v-for="(paragraph, index) in remainingParagraphs" :key="'rest-' + index">
             {{ paragraph }}
           </p>
         </template>
 
+        <!-- gumb za prikaz ostatka teksta, prikazuje se samo ako ima još teksta koji nije priazan -->
         <q-btn
           v-if="remainingParagraphs.length && !showFullText"
           flat
@@ -32,7 +37,7 @@
         />
       </div>
 
-      <!-- RIGHT -->
+      <!-- kartica sa informacijama koja se nalazi desno -->
       <div class="member-info">
         <div class="info-row">
           <span>Date of Birth</span>
@@ -44,6 +49,7 @@
           <strong>{{ member.nationality }}</strong>
         </div>
 
+        <!-- ako je driver ili reserve driver mu se prikazuje broj -->
         <div v-if="member.role === 'driver' || member.role === 'reserve_driver'" class="info-row">
           <span>Driver Number</span>
           <strong>#{{ member.driver_number }}</strong>
@@ -51,11 +57,11 @@
       </div>
     </div>
 
-    <!-- RACING HISTORY -->
+    <!-- dio sa karticama koje prikazuju povijesti u sportu -->
     <div class="racing-section" v-if="racingHistory.length">
       <h3 class="racing-title">EVERY YEAR IN RACING</h3>
 
-      <!-- ARROWS -->
+      <!-- strelice za pomicanje -->
       <div class="racing-arrows">
         <div class="arrow-box" @click="prev">
           <i class="fas fa-chevron-left"></i>
@@ -66,10 +72,10 @@
         </div>
       </div>
 
-      <!-- CARDS -->
+      <!-- kartica sa povijesti u sportu -->
       <div class="racing-wrapper">
         <div class="racing-track" :style="{ transform: `translateX(-${currentIndex * 100}%)` }">
-          <div class="racing-group" v-for="(group, gIndex) in groupedHistory" :key="gIndex">
+          <div class="racing-group" v-for="(group, gIndex) in groupedHistory" :key="gIndex"> <!-- svaka grupa ima 3 kartice -->
             <div class="racing-card" v-for="item in group" :key="item.id">
               <div class="racing-card-inner">
                 <div class="year-bar">
@@ -86,12 +92,12 @@
       </div>
     </div>
 
-    <!-- GALLERY -->
+    <!-- galerija sa slikama člana -->
     <div class="gallery-section" v-if="teamGallery.length">
       <h4 class="gallery-subtitle">THROUGH THE YEARS</h4>
       <h3 class="gallery-title">ON THE GRID</h3>
 
-      <!-- ARROWS (iste kao gore) -->
+      <!-- strelice za pomicanje -->
       <div class="gallery-arrows">
         <div class="arrow-box" @click="prevGallery">
           <i class="fas fa-chevron-left"></i>
@@ -102,10 +108,10 @@
         </div>
       </div>
 
-      <!-- SLIDER -->
+      <!-- slider galerije -->
       <div class="gallery-wrapper">
         <div class="gallery-track" :style="{ transform: `translateX(-${galleryIndex * 100}%)` }">
-          <div class="gallery-group" v-for="(group, gIndex) in groupedGallery" :key="gIndex">
+          <div class="gallery-group" v-for="(group, gIndex) in groupedGallery" :key="gIndex"> <!-- svaka grupa ima 2 slike -->
             <div class="gallery-item" v-for="img in group" :key="img.id">
               <img :src="getImage(img.image)" />
             </div>
@@ -121,56 +127,57 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
 
-const route = useRoute()
+const route = useRoute() // dohvaća id člana iz urla
 
-const member = ref(null)
-const showFullText = ref(false)
+const member = ref(null) // sprema podatke trenutnog člana
+const showFullText = ref(false) // određuje prikazuje li se cijeli tekst ili samo dio
 
-const racingHistory = ref([])
-const currentIndex = ref(0)
+const racingHistory = ref([]) //sprema povijest člana
+const currentIndex = ref(0) // trenutni indeks za slider u povijesti vozača
 
-const api_url = import.meta.env.VITE_API_URL
+const api_url = import.meta.env.VITE_API_URL // url backend apija u .env datoteci
 
+// funkcija prima putanju slike iz baze i pretvara je u potpuni url do slike
 const getImage = (path) => {
   if (!path) return ''
   return `${api_url}/${encodeURI(path)}`
 }
 
+// funkcija dohvaća podatke o članu tima čiji je id u url
 const loadMember = async () => {
   const res = await axios.get(`${api_url}/haas-team/${route.params.id}`)
-
   member.value = res.data
 }
 
+// computed vrijednost dijeli opis u odlomke
 const paragraphs = computed(() => {
   if (!member.value?.description) return []
-
-  return member.value.description.split('\n').filter((p) => p.trim() !== '')
+  return member.value.description.split('\n').filter((p) => p.trim() !== '') //ako je razdvojen novim redom ond aje to novi odlomak
 })
 
-/* PRIKAŽI PRVA 3 ODLOMKA */
+// prikazuje prva 2 odlomka teksta
 const firstParagraphs = computed(() => {
   return paragraphs.value.slice(0, 2)
 })
 
-/* OSTATAK TEKSTA */
+// sprema ostale odlomke koji se prikazuju kada se stisne gumb
 const remainingParagraphs = computed(() => {
   return paragraphs.value.slice(2)
 })
 
+// funkcija formatira doatum u hrvatski format
 const formatDate = (date) => {
   return new Date(date).toLocaleDateString('hr-HR')
 }
 
-onMounted(loadMember)
 
-/* dio za kartice sa povijesti */
+// funkcija dohvaća povijest člana tima
 const loadRacingHistory = async () => {
   const res = await axios.get(`${api_url}/career-history/${route.params.id}`)
   racingHistory.value = res.data
 }
 
-/* 3 kartice po slide-u */
+// computed vrijednost grupira povijest u grupe po 3 kartice
 const groupedHistory = computed(() => {
   const groups = []
   for (let i = 0; i < racingHistory.value.length; i += 3) {
@@ -179,33 +186,30 @@ const groupedHistory = computed(() => {
   return groups
 })
 
+// pomicanje slidera povijesti naprijed
 const next = () => {
   if (currentIndex.value < groupedHistory.value.length - 1) {
     currentIndex.value++
   }
 }
 
+// pomicanje slidera povijest nazad
 const prev = () => {
   if (currentIndex.value > 0) {
     currentIndex.value--
   }
 }
 
-onMounted(() => {
-  loadMember()
-  loadRacingHistory()
-})
+const teamGallery = ref([]) // sprema slike galerije
+const galleryIndex = ref(0) // trenutni indeks slidera galerije
 
-const teamGallery = ref([])
-const galleryIndex = ref(0)
-
-/* LOAD GALLERY */
+// funkcija dohvaća slike za galeriju
 const loadTeamGallery = async () => {
   const res = await axios.get(`${api_url}/team-gallery/${route.params.id}`)
   teamGallery.value = res.data
 }
 
-/* grupiranje po 3 slike */
+// compud+ted vrijednost grupira galeriju po dvije slike
 const groupedGallery = computed(() => {
   const groups = []
   for (let i = 0; i < teamGallery.value.length; i += 2) {
@@ -214,25 +218,29 @@ const groupedGallery = computed(() => {
   return groups
 })
 
+// pomicanje galerije naprijed
 const nextGallery = () => {
   if (galleryIndex.value < groupedGallery.value.length - 1) {
     galleryIndex.value++
   }
 }
 
+// pomicanje galerije nazad
 const prevGallery = () => {
   if (galleryIndex.value > 0) {
     galleryIndex.value--
   }
 }
 
-/* dodaj u onMounted */
+// nakon učitavanja dohvaćaju se podatci člana tima, povijest i galerija
 onMounted(() => {
+  loadMember()
+  loadRacingHistory()
   loadTeamGallery()
 })
 </script>
 
-<style>
+<style scoped>
 .hero-section {
   position: relative;
   width: 100%;
@@ -244,10 +252,10 @@ onMounted(() => {
   display: block;
 }
 
+/* tamno na slici */
 .hero-overlay {
   position: absolute;
   inset: 0;
-
   background: linear-gradient(
     to top,
     rgba(0, 0, 0, 0.85) 0%,
@@ -256,6 +264,7 @@ onMounted(() => {
   );
 }
 
+/* tekst preko slike */
 .hero-text {
   position: absolute;
   z-index: 2;
@@ -263,6 +272,7 @@ onMounted(() => {
   bottom: 60px;
 }
 
+/* dio sa tekstom i karticom */
 .member-content {
   display: flex;
   gap: 400px; /* razmak između teksta i kartice */
@@ -273,13 +283,15 @@ onMounted(() => {
   flex: 1;
 }
 
+/* odlomak teksta */
 .member-description p {
   margin-bottom: 25px;
   text-align: justify;
 }
 
+/* kartica sa informacijama */
 .member-info {
-  width: 320px; /* fiksna uža širina */
+  width: 320px; 
   flex-shrink: 0;
   background: var(--q-accent);
   padding: 35px;
@@ -289,6 +301,7 @@ onMounted(() => {
   box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
 }
 
+/* miče doni razmak na zadnjem redu u kartici */
 .info-row:last-child {
   margin-bottom: 0;
 }
@@ -297,38 +310,42 @@ onMounted(() => {
   margin-bottom: 25px;
 }
 
+/* naziv podataka */
 .info-row span {
   display: block;
-  font-weight: 700; /* naslov podebljan */
+  font-weight: 700; 
   color: #000000;
   margin-bottom: 8px;
 }
 
+/* vrijednost podatka ispod naziva */
 .info-row strong {
   display: block;
-  font-weight: 400; /* podatak normalan */
+  font-weight: 400; 
   color: #000000;
   line-height: 1.5;
 }
 
+/* gumb za prikaz vise teksta */
 .load-more-btn {
   padding-left: 0;
 }
 
+/* dio sa povijesti */
 .racing-section {
   padding: 80px 70px;
   position: relative;
 }
 
-/* PROSTOR IZMEĐU NASLOVA I KARTICA (OVDJE SU STRELICE) */
+/* dio za strelice */
 .racing-arrows {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  margin-bottom: 30px; /* KLJUČNO: razmak do kartica */
+  margin-bottom: 30px; 
 }
 
-/* STRELICA - pravokutna */
+/* strelice */
 .arrow-box {
   width: 55px;
   height: 32px;
@@ -341,41 +358,40 @@ onMounted(() => {
   border: 1px solid var(--q-primary);
 }
 
-/* hover efekt */
 .arrow-box:hover {
   background: transparent;
   border: 1px solid var(--q-primary);
 }
 
+/* ikona strelice */
 .arrow-box i {
   color: white;
   transition: 0.25s ease;
 }
 
-/* hover -> strelica postaje primary */
 .arrow-box:hover i {
   color: var(--q-primary);
 }
 
-/* WRAPPER */
+/* skriva kartice koje nisu u prikazu */
 .racing-wrapper {
   overflow: hidden;
 }
 
-/* TRACK */
+/* sve grupe kartica */
 .racing-track {
   display: flex;
   transition: transform 0.5s ease;
 }
 
-/* GRUPE */
+/* jedna grupa kartica */
 .racing-group {
   display: flex;
   gap: 50px;
   min-width: 100%;
 }
 
-/* KARTICA */
+/* jedna kartica */
 .racing-card {
   width: calc((100% - 100px) / 3);
   flex-shrink: 0;
@@ -383,13 +399,13 @@ onMounted(() => {
   box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
 }
 
-/* UNUTRAŠNJOST */
+/* unutarnji dio kartice */
 .racing-card-inner {
   display: flex;
   flex-direction: column;
 }
 
-/* YEAR BAR - LIJEVO, KRATKO */
+/* traka sa godinom */
 .year-bar {
   width: 25%;
   height: 34px;
@@ -408,7 +424,7 @@ onMounted(() => {
   font-size: 16px; /* manji tekst */
 }
 
-/* TEKST ISPOD */
+/* tekst u kartici */
 .race-text {
   font-size: 16px;
   line-height: 1.5;
@@ -424,7 +440,7 @@ onMounted(() => {
   margin-top: 10px;
 }
 
-/* ARROWS */
+/* strelice */
 .gallery-arrows {
   display: flex;
   justify-content: flex-end;
@@ -432,7 +448,7 @@ onMounted(() => {
   margin: 20px 0 40px 0;
 }
 
-/* SLIDER */
+/* vanjski dio, skriva slike koje nisu prikazane */
 .gallery-wrapper {
   overflow: hidden;
 }
@@ -442,6 +458,7 @@ onMounted(() => {
   transition: transform 0.5s ease;
 }
 
+/* jedna grupa slikas */
 .gallery-group {
   display: flex;
   gap: 40px;
@@ -453,6 +470,7 @@ onMounted(() => {
   width: calc((100% - 40px) / 2);
 }
 
+/* slika */
 .gallery-item img {
   width: 100%;
   height: auto;
