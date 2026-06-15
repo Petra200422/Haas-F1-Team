@@ -199,7 +199,7 @@ const circuitGallery = ref([]) // sprema galeriju slika
 const galleryIndex = ref(0) // trenutni indeks galerije
 
 const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone // dohvaća vremensku zoni korisnika iz preglednika
-const useMyTimezone = ref(false) // određuje prikazuje li se vrijeme lokalno ili u korisnkovoj zoni
+const useMyTimezone = ref(true) // određuje prikazuje li se vrijeme lokalno ili u korisnkovoj zoni
 
 // prima putanju slike iz baze i pretvara je u puni url
 const getImage = (path) => {

@@ -28,9 +28,9 @@ const db = mysql.createConnection({
 
 db.connect((err) => {
   if (err) {
-    console.log("Greška prilikom spajanja:", err);
+    console.log("Database connection error:", err);
   } else {
-    console.log("Uspješno spajanje na bazu");
+    console.log("Successfully connected to the database");
   }
 });
 
@@ -895,22 +895,71 @@ app.get("/team-standings", (req, res) => {
 });
 
 
-//corn se pokreće svaki dan u 3:00
-//ažurira poredak vozača, poredak timova i datume utrka
-cron.schedule("0 3 * * *", async () => {
-  console.log("Daily standings update started");
+//datoteka u koju se sprema vrijeme zadnjeg ažuriranja podataka
+const UPDATE_FILE = "lastUpdate.json";
 
-  await updateDriverStandings();
-  await updateTeamStandings();
-  await updateRaceDates();
+const updateIfNeeded = async () => {
+  try {
+    const now = new Date();
+
+    let lastUpdate = null;
+
+    //učitavanje vremena zadnjeg updatea
+    if (fs.existsSync(UPDATE_FILE)) {
+      const data = JSON.parse(fs.readFileSync(UPDATE_FILE, "utf8"));
+      lastUpdate = new Date(data.lastUpdate);
+    }
+
+    // 12 sati u milisekundama
+    const twelveHours = 12 * 60 * 60 * 1000;
+
+    //preskoči update ako nije prošlo 12 sati
+    if (
+      lastUpdate &&
+      now.getTime() - lastUpdate.getTime() < twelveHours
+    ) {
+      console.log("Update skipped - less than 12 hours since last update.");
+      return;
+    }
+
+    console.log("Automatic update started");
+
+    await updateDriverStandings();
+    await updateTeamStandings();
+    await updateRaceDates();
+
+    //spremanje vremena uspješnog updatea
+    fs.writeFileSync(
+      UPDATE_FILE,
+      JSON.stringify({
+        lastUpdate: now.toISOString(),
+      })
+    );
+
+    console.log("Automatic update finished");
+  } catch (err) {
+    console.error("Automatic update failed:", err);
+  }
+};
+
+
+//corn se pokreće svaki dan u 00:00
+//ažurira poredak vozača, poredak timova i datume utrka ako je prošlo više od 24 sata od prošlod updatea
+cron.schedule("0 0 * * *", async () => {
+  console.log("Daily standings update started");
+await updateIfNeeded();
 
   console.log("Daily standings update finished");
 });
 
 //port na kojem backend server radi
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 
-//pokretanje express servera
+//pokretanje express servera i updatea boodva ako je potrebno
 app.listen(PORT, () => {
-  console.log(`Server radi na portu ${PORT}`);
+  console.log(`Server on port ${PORT}`);
+
+   updateIfNeeded().catch((err) => {
+    console.error("Startup update failed:", err);
+  });
 });
